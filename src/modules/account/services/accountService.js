@@ -4,6 +4,14 @@ import jwt from "../../../shared/utils/jwt.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
 
 const accountService = {
+  getTokenInfo: (req, res) => {
+    const result = jwtVerify(req.headers.token, process.env.JWT_KEY);
+
+    if (!result) {
+      sendError({ status: 401, message: CONSTANTS.MSG[401] });
+    }
+    return result;
+  },
   getRedirectUrl: (req, res) => {
     let url = "https://accounts.google.com/o/oauth2/v2/auth";
     url += `?client_id=${process.env.GOOGLE_ID}`;
@@ -53,6 +61,14 @@ const accountService = {
     }
 
     return result;
+  },
+
+  selectIdx: async (req, res) => {
+    const { idx } = jwtVerify(req.headers.token);
+
+    const account = await accountModel.selectFromIdx({ idx: idx });
+
+    return account;
   },
   insertAccount: () => {},
   selectAccount: () => {},

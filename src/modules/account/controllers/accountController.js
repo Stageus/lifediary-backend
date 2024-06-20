@@ -18,6 +18,24 @@ const accountController = {
       next(err);
     }
   },
+
+  getAuth: async (req, res) => {
+    try {
+      const result = accountService.getTokenInfo(req, res);
+      res.status(200).send(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  get: async (req, res) => {
+    try {
+      const result = await accountService.selectIdx(req, res);
+      res.status(200).send(result);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 export default accountController;
