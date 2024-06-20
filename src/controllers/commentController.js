@@ -25,7 +25,14 @@ const commentController = {
       next(err)
     }
   },
-  put: (req, res) => {},
+  put: async (req, res, next) => {
+    try {
+      const result = await commentService.update(req, res)
+      res.status(200).send(result)
+    } catch (err) {
+      next(err)
+    }
+  },
   delete: (req, res) => {},
 }
 

@@ -5,10 +5,20 @@ const commentModel = {
   selectDiaryOwnerIdx: async ({ parentCommentIdx }) => {
     const values = [parentCommentIdx]
     const sql = `
-      SELECT d.accountIdx AS "accountIdx"
-      FROM comment AS parentComment
-      JOIN diary AS d ON d.idx = parentComment.diaryIdx
-      WHERE parentComment.idx = $1
+      SELECT c.parentCommentIdx, d.accountIdx AS "accountIdx"
+      FROM comment AS c
+      JOIN diary AS d ON d.idx = c.diaryIdx
+      WHERE c.idx = $1
+    `
+
+    return await psqlPool.query(sql, values)
+  },
+  selectCommentOwnerIdx: async ({ commentIdx }) => {
+    const values = [commentIdx]
+    const sql = `
+      SELECT c.accountIdx AS "accountIdx"
+      FROM comment AS c
+      WHERE c.idx = $1
     `
 
     return await psqlPool.query(sql, values)
@@ -16,20 +26,14 @@ const commentModel = {
   insertReply: async ({ textContent, accountIdx, parentCommentIdx }) => {
     const values = [accountIdx, textContent, parentCommentIdx]
     const sql = `
-      WITH validParent AS (
+      WITH tmp AS (
         SELECT diaryIdx
         FROM comment AS parentComment
-        WHERE 
-          parentComment.idx = $3
-          AND parentComment.parentCommentIdx IS NULL
+        WHERE parentComment.idx = $3
       )
       INSERT INTO comment (diaryIdx, accountIdx, textContent, parentCommentIdx)
-      SELECT 
-        validParent.diaryIdx, $1, $2, $3
-      FROM validParent
-      WHERE EXISTS (
-        SELECT 1 FROM validParent
-      );
+      SELECT tmp.diaryIdx, $1, $2, $3 
+      FROM tmp
     `
 
     return await psqlPool.query(sql, values)
@@ -87,7 +91,16 @@ const commentModel = {
     return await psqlPool.query(sql, values)
   },
   delete: () => {},
-  update: () => {},
+  update: async ({ commentIdx, textContent, accountIdx }) => {
+    const values = [textContent, commentIdx, accountIdx]
+    const sql = `
+      UPDATE comment
+      SET textContent = $1
+      WHERE idx = $2 AND accountIdx = $3
+    `
+
+    return await psqlPool.query(sql, values)
+  },
 }
 
 export default commentModel

@@ -13,7 +13,7 @@ const commentService = {
         accountIdx: accountIdx,
         page: page,
       })
-      .catch(() => sendError({ status: 500, message: smaple }))
+      .catch(() => sendError({ status: 500, message: 'smaple' }))
 
     if (result.rowCount === 0) sendError({ status: 404, message: 'sample' })
 
@@ -30,7 +30,7 @@ const commentService = {
         accountIdx: accountIdx,
         textContent: textContent,
       })
-      .catch(() => sendError({ status: 500, message: smaple }))
+      .catch(() => sendError({ status: 500, message: 'smaple' }))
 
     if (result.rowCount === 0) sendError({ status: 404, message: 'sample' })
 
@@ -41,30 +41,52 @@ const commentService = {
     const { textContent } = req.body
     const { accountIdx } = jwtVerify(req.headers.token)
 
-    const result1 = await commentModel
+    const check = await commentModel
       .selectDiaryOwnerIdx({
         parentCommentIdx: parentCommentIdx,
-        accountIdx: accountIdx,
-        textContent: textContent,
       })
-      .catch(() => sendError({ status: 500, message: smaple }))
+      .catch(() => sendError({ status: 500, message: 'smaple' }))
 
-    if (result1.rows[0].accountIdx !== accountIdx)
+    if (check.rows[0].accountIdx !== accountIdx)
       sendError({ status: 403, message: 'sample' })
 
-    const result2 = await commentModel
+    const result = await commentModel
       .insertReply({
         accountIdx: accountIdx,
         textContent: textContent,
         parentCommentIdx: parentCommentIdx,
       })
-      .catch(() => sendError({ status: 500, message: smaple }))
+      .catch(() => sendError({ status: 500, message: 'smaple' }))
 
-    if (result2.rowCount === 0) sendError({ status: 404, message: 'sample' })
+    if (result.rowCount === 0) sendError({ status: 404, message: 'sample' })
 
-    return result2.rows
+    return result.rows
   },
-  update: () => {},
+  update: async (req, res) => {
+    const { commentIdx } = req.params
+    const { textContent } = req.body
+    const { accountIdx } = jwtVerify(req.headers.token)
+
+    const check = await commentModel
+      .selectCommentOwnerIdx({
+        commentIdx: commentIdx,
+      })
+      .catch(() => sendError({ status: 500, message: 'smaple' }))
+
+    if (check.rowCount === 0) sendError({ status: 404, message: 'sample' })
+    if (check.rows[0].accountIdx !== accountIdx)
+      sendError({ status: 403, message: 'sample' })
+
+    const result = await commentModel
+      .update({
+        commentIdx: commentIdx,
+        accountIdx: accountIdx,
+        textContent: textContent,
+      })
+      .catch(() => sendError({ status: 500, message: 'smaple' }))
+
+    return result.rows
+  },
   delete: () => {},
 }
 
