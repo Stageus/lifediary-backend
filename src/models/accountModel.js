@@ -2,7 +2,8 @@ import psqlPool from "../utils/psqlPool.js";
 
 const accountModel = {
   insert: () => {},
-  select: async ({ id }) => {
+  select: () => {},
+  selectFromGoogleId: async ({ id }) => {
     const sql = `
               SELECT *
               FROM account

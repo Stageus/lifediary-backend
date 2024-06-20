@@ -1,6 +1,6 @@
 import axios from "axios";
-import jwtSign from "../configs/jwtConfig.js";
 import accountModel from "../models/accountModel.js";
+import jwtSign from "../utils/jwt.js";
 
 const accountService = {
   getRedirectUrl: (req, res) => {
@@ -31,10 +31,17 @@ const accountService = {
     });
 
     let result = {};
-    const account = accountModel.select({ id: googleAccountInfo.data.id });
+    const account = accountModel.selectFromGoogleId({
+      id: googleAccountInfo.data.id,
+    });
 
     if (account) {
-      const token = jwtSign(user.profileImg, user.idx, user.permission);
+      const token = jwtSign({
+        profileImg: account.profileImg,
+        idx: account.idx,
+        permission: account.permission,
+      });
+
       result = { token: token, isAccountExist: true };
     } else {
       result = {
