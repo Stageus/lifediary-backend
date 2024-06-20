@@ -1,11 +1,12 @@
-import commentModel from '../models/commentModel.js'
-import jwtVerify from '../utils/jwtVerify.js'
-import sendError from '../utils/sendError.js'
+import commentModel from "../models/commentModel.js";
+import CONSTANTS from "../utils/constansts.js";
+import jwtVerify from "../utils/jwtVerify.js";
+import sendError from "../utils/sendError.js";
 
 const commentService = {
   selectComments: async (req, res) => {
-    const { page, diaryIdx } = req.query
-    const { accountIdx } = jwtVerify(req.headers.token)
+    const { page, diaryIdx } = req.query;
+    const { accountIdx } = jwtVerify(req.headers.token);
 
     const result = await commentModel
       .selectList({
@@ -13,16 +14,23 @@ const commentService = {
         accountIdx: accountIdx,
         page: page,
       })
-      .catch(() => sendError({ status: 500, message: 'smaple' }))
+      .catch(() =>
+        sendError({
+          status: 500,
+          message: CONSTANTS.MSG[500],
+          stack: err.stack,
+        })
+      );
 
-    if (result.rowCount === 0) sendError({ status: 404, message: 'sample' })
+    if (result.rowCount === 0)
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
-    return result.rows
+    return result.rows;
   },
   insert: async (req, res) => {
-    const { diaryIdx } = req.query
-    const { textContent } = req.body
-    const { accountIdx } = jwtVerify(req.headers.token)
+    const { diaryIdx } = req.query;
+    const { textContent } = req.body;
+    const { accountIdx } = jwtVerify(req.headers.token);
 
     const result = await commentModel
       .insert({
@@ -30,25 +38,40 @@ const commentService = {
         accountIdx: accountIdx,
         textContent: textContent,
       })
-      .catch(() => sendError({ status: 500, message: 'smaple' }))
+      .catch(() =>
+        sendError({
+          status: 500,
+          message: CONSTANTS.MSG[500],
+          stack: err.stack,
+        })
+      );
 
-    if (result.rowCount === 0) sendError({ status: 404, message: 'sample' })
+    if (result.rowCount === 0)
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
-    return result.rows
+    return result.rows;
   },
   insertReply: async (req, res) => {
-    const { parentCommentIdx } = req.params
-    const { textContent } = req.body
-    const { accountIdx } = jwtVerify(req.headers.token)
+    const { parentCommentIdx } = req.params;
+    const { textContent } = req.body;
+    const { accountIdx } = jwtVerify(req.headers.token);
 
     const check = await commentModel
       .selectDiaryOwnerIdx({
         parentCommentIdx: parentCommentIdx,
       })
-      .catch(() => sendError({ status: 500, message: 'smaple' }))
+      .catch(() =>
+        sendError({
+          status: 500,
+          message: CONSTANTS.MSG[500],
+          stack: err.stack,
+        })
+      );
 
+    if (check.rowCount === 0)
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].accountIdx !== accountIdx)
-      sendError({ status: 403, message: 'sample' })
+      sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
     const result = await commentModel
       .insertReply({
@@ -56,26 +79,37 @@ const commentService = {
         textContent: textContent,
         parentCommentIdx: parentCommentIdx,
       })
-      .catch(() => sendError({ status: 500, message: 'smaple' }))
+      .catch(() =>
+        sendError({
+          status: 500,
+          message: CONSTANTS.MSG[500],
+          stack: err.stack,
+        })
+      );
 
-    if (result.rowCount === 0) sendError({ status: 404, message: 'sample' })
-
-    return result.rows
+    return result.rows;
   },
   update: async (req, res) => {
-    const { commentIdx } = req.params
-    const { textContent } = req.body
-    const { accountIdx } = jwtVerify(req.headers.token)
+    const { commentIdx } = req.params;
+    const { textContent } = req.body;
+    const { accountIdx } = jwtVerify(req.headers.token);
 
     const check = await commentModel
       .selectCommentOwnerIdx({
         commentIdx: commentIdx,
       })
-      .catch(() => sendError({ status: 500, message: 'smaple' }))
+      .catch(() =>
+        sendError({
+          status: 500,
+          message: CONSTANTS.MSG[500],
+          stack: err.stack,
+        })
+      );
 
-    if (check.rowCount === 0) sendError({ status: 404, message: 'sample' })
+    if (check.rowCount === 0)
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].accountIdx !== accountIdx)
-      sendError({ status: 403, message: 'sample' })
+      sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
     const result = await commentModel
       .update({
@@ -83,11 +117,46 @@ const commentService = {
         accountIdx: accountIdx,
         textContent: textContent,
       })
-      .catch(() => sendError({ status: 500, message: 'smaple' }))
+      .catch(() => sendError({ status: 500, message: CONSTANTS.MSG[500] }));
 
-    return result.rows
+    return result.rows;
   },
-  delete: () => {},
-}
+  delete: async (req, res) => {
+    const { commentIdx } = req.params;
+    const { accountIdx } = jwtVerify(req.headers.token);
 
-export default commentService
+    const check = await commentModel
+      .selectCommentOwnerIdx({
+        commentIdx: commentIdx,
+      })
+      .catch(() =>
+        sendError({
+          status: 500,
+          message: CONSTANTS.MSG[500],
+          stack: err.stack,
+        })
+      );
+
+    if (check.rowCount === 0)
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    if (check.rows[0].accountIdx !== accountIdx)
+      sendError({ status: 403, message: CONSTANTS.MSG[403] });
+
+    const result = await commentModel
+      .delete({
+        commentIdx: commentIdx,
+        accountIdx: accountIdx,
+      })
+      .catch((err) =>
+        sendError({
+          status: 500,
+          message: CONSTANTS.MSG[500],
+          stack: err.stack,
+        })
+      );
+
+    return result.rows;
+  },
+};
+
+export default commentService;

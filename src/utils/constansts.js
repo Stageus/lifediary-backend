@@ -1,7 +1,12 @@
 const CONSTANTS = Object.freeze({
-  COMMENT_PAGE_LIMIT: 10,
-})
+  MSG: Object.freeze({
+    500: "something broke",
+    404: "no resouce",
+    403: "wrong access",
+  }),
+  RULE: Object.freeze({
+    COMMENT_PAGE_LIMIT: 10,
+  }),
+});
 
-const MSG = Object.freeze({})
-
-export { CONSTANTS, MSG }
+export default CONSTANTS;
