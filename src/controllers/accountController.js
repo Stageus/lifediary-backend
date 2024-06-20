@@ -1,11 +1,23 @@
-import accountService from '../services/accountService.js'
+import accountService from "../services/accountService.js";
 
 const accountController = {
-  post: [
-    (req, res) => {
-      res.send(data)
-    },
-  ],
-}
+  getRedirectUrl: (req, res) => {
+    try {
+      const result = accountService.getRedirectUrl(req, res);
+      res.status(200).send(result);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-export default accountController
+  getIsAccountExist: (req, res) => {
+    try {
+      const result = accountService.selectOauthGoogleId(req, res);
+      res.status(200).send(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+};
+
+export default accountController;
