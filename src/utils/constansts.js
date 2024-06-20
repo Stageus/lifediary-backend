@@ -1,15 +1,12 @@
-validator(accountSchema.post)
-// validator middleware
-error -> 
+const CONSTANTS = Object.freeze({
+  MSG: Object.freeze({
+    500: "something broke",
+    404: "no resouce",
+    403: "wrong access",
+  }),
+  RULE: Object.freeze({
+    COMMENT_PAGE_LIMIT: 10,
+  }),
+});
 
-
-// accountSchema
-const accountSchema = {
-  post: [nickname, profileImg],
-  putNickname: [nickname],
-}
-
-// unit
-{
-  nickname: body['nickname'].min(6)
-}
+export default CONSTANTS;
