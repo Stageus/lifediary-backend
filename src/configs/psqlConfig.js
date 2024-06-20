@@ -1,5 +1,5 @@
-import dotenv from 'dotenv'
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
 
 const psqlConfig = {
   host: process.env.DB_PSQL_HOST,
@@ -9,6 +9,6 @@ const psqlConfig = {
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-}
+};
 
-export default psqlConfig
+export default psqlConfig;

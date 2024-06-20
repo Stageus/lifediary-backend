@@ -1,9 +1,12 @@
-import express from 'express'
-import accountController from '../controllers/accountController.js'
+import express from "express";
+import accountController from "../controllers/accountController.js";
+import commentController from "../controllers/commentController.js";
 
-const api = express.Router()
+const api = express.Router();
 
-// api.get('/account/login/oauth/google', accountController)
+api
+   .get("/account/login/oauth/google", accountController.getRedirectUrl);
+   .get("/account/login/oauth/google/redirect", accountController.getIsAccountExist);
 //   .get('/account', accountController)
 //   .get('/account/profileImg', accountController)
 //   .get('/account/:accountIdx', accountController)
@@ -35,6 +38,12 @@ const api = express.Router()
 //   .post('/comment/:commentIdx/reply', commentController)
 //   .put('/comment/:commentIdx', commentController)
 //   .delete('/comment/:commentIdx', commentController)
+  //
+  .get("/comment", commentController.get)
+  .post("/comment", commentController.post)
+  .post("/comment/:parentCommentIdx/reply", commentController.postReply)
+  .put("/comment/:commentIdx", commentController.put)
+  .delete("/comment/:commentIdx", commentController.delete);
 //   //
 //   .get('/report', reportController)
 //   .get('/report/new', reportController)
@@ -45,4 +54,4 @@ const api = express.Router()
 //   .delete('/notice/:noticeIdx', noticeController)
 //   .get('/notice/new', noticeController)
 
-export default api
+export default api;
