@@ -8,6 +8,4 @@ const app = express();
 app.use(express.json());
 app.use("/", api);
 
-app.listen(8000, () => {
-  console.log(`8000번 포트로 실행 중`);
-});
+app.listen(8000, () => {});

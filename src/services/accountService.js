@@ -1,6 +1,6 @@
 import axios from "axios";
-import psqlPool from "../utils/psqlPool.js";
 import jwtSign from "../configs/jwtConfig.js";
+import accountModel from "../models/accountModel.js";
 
 const accountService = {
   getRedirectUrl: (req, res) => {
@@ -10,7 +10,6 @@ const accountService = {
     url += "&response_type=code";
     url += "&scope=email profile";
 
-    console.log(url);
     return { redirectUrl: url };
   },
 
@@ -31,17 +30,10 @@ const accountService = {
       },
     });
 
-    const sql = `
-              SELECT *
-              FROM account
-              WHERE oauthGoogleId = $1;
-              `;
-    const values = [googleAccountInfo.data.id];
-    const selectedResult = await psqlPool.query(sql, values);
-    const user = selectedResult.rows[0];
-
     let result = {};
-    if (user) {
+    const account = accountModel.select({ id: googleAccountInfo.data.id });
+
+    if (account) {
       const token = jwtSign(user.profileImg, user.idx, user.permission);
       result = { token: token, isAccountExist: true };
     } else {
