@@ -1,6 +1,6 @@
 import axios from "axios";
 import accountModel from "../models/accountModel.js";
-import jwtSign from "../utils/jwt.js";
+import jwtSign from "../utils/jwtSign.js";
 
 const accountService = {
   getRedirectUrl: (req, res) => {
