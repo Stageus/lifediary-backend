@@ -1,15 +1,14 @@
 import express from "express";
+import validator from "../middlewares/validator.js";
 import accountController from "../controllers/accountController.js";
 import commentController from "../controllers/commentController.js";
+import commentSchema from "../schema/commentSchema.js";
 
 const api = express.Router();
 
 api
   .get("/account/login/oauth/google", accountController.getRedirectUrl)
-  .get(
-    "/account/login/oauth/google/redirect",
-    accountController.getIsAccountExist
-  )
+  .get("/account/login/oauth/google/redirect", accountController.getIsAccountExist)
   //   .get('/account', accountController)
   //   .get('/account/profileImg', accountController)
   //   .get('/account/:accountIdx', accountController)
@@ -42,11 +41,11 @@ api
   //   .put('/comment/:commentIdx', commentController)
   //   .delete('/comment/:commentIdx', commentController)
   //
-  .get("/comment", commentController.get)
-  .post("/comment", commentController.post)
-  .post("/comment/:parentCommentIdx/reply", commentController.postReply)
-  .put("/comment/:commentIdx", commentController.put)
-  .delete("/comment/:commentIdx", commentController.delete);
+  .get("/comment", validator(commentSchema.get), commentController.get)
+  .post("/comment", validator(commentSchema.post), commentController.post)
+  .post("/comment/:parentCommentIdx/reply", validator(commentSchema.postReply), commentController.postReply)
+  .put("/comment/:commentIdx", validator(commentSchema.put), commentController.put)
+  .delete("/comment/:commentIdx", validator(commentSchema.delete), commentController.delete);
 //   //
 //   .get('/report', reportController)
 //   .get('/report/new', reportController)
