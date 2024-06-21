@@ -41,15 +41,22 @@ const commentModel = {
   insert: async ({ diaryIdx, textContent, accountIdx }) => {
     const values = [diaryIdx, accountIdx, textContent];
     const sql = `
-      isDiaryExist AS (
+      WITH isDiaryExist AS (
         SELECT 1
         FROM diary 
         WHERE idx = $1
+      ),
+      updateCommentCnt AS (
+        UPDATE diary 
+        SET commentCnt = commentCnt + 1 
+        WHERE 
+          EXISTS (SELECT 1 FROM isDiaryExist)
+          AND idx = $1
       )
       INSERT INTO comment (diaryIdx, accountIdx, textContent)
       SELECT $1, $2, $3
       WHERE EXISTS 
-        (SELECT 1 FROM isDiaryExist);
+        (SELECT 1 FROM isDiaryExist)
     `;
 
     return await psqlPool.query(sql, values);
@@ -102,8 +109,20 @@ const commentModel = {
   delete: async ({ commentIdx, accountIdx }) => {
     const values = [commentIdx, accountIdx];
     const sql = `
-      DELETE FROM comment
-      WHERE idx = $1 AND accountIdx = $2
+      WITH isCommentDeleted AS (
+        DELETE FROM comment
+        WHERE idx = $1 AND accountIdx = $2
+        RETURNING *
+      )
+      UPDATE diary 
+      SET commentCnt = commentCnt - 1 
+      WHERE 
+        EXISTS (SELECT 1 FROM isCommentDeleted)
+        AND idx = (
+          SELECT diaryIdx 
+          FROM comment 
+          WHERE idx = $1
+        );
     `;
 
     return await psqlPool.query(sql, values);
