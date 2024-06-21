@@ -28,11 +28,11 @@ const logger = (req, res, next) => {
         reqParams: JSON.stringify(req.params),
         reqBody: JSON.stringify(req.body),
         reqQuery: JSON.stringify(req.query),
-        resMessage: body.message || null,
-        resResult: body.result || null,
+        resMessage: body && body.message,
+        resResult: body && body.result,
         responseTime: (performance.now() - start).toFixed(2) + "ms",
         createdAt: new Date(),
-        errStack: body.stack,
+        errStack: body && body.stack,
       },
     ];
 
