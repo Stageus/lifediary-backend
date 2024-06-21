@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import jwtVerify from "../utils/jwtVerify.js";
-import writeLog from "../utils/writeCsv.js";
+import writeLogCsv from "../utils/writeLogCsv.js";
 
 const logger = (req, res, next) => {
   const originalSend = res.send;
@@ -37,11 +37,11 @@ const logger = (req, res, next) => {
     ];
 
     await Promise.all([
-      writeLog({ filePath: filePath.all, log: log }),
+      writeLogCsv({ filePath: filePath.all, log: log }),
       res.statusCode.toString().startsWith("4") &&
-        writeLog({ filePath: filePath.clientError, log: log }),
+        writeLogCsv({ filePath: filePath.clientError, log: log }),
       res.statusCode.toString().startsWith("5") &&
-        writeLog({ filePath: filePath.serverError, log: log }),
+        writeLogCsv({ filePath: filePath.serverError, log: log }),
     ]);
 
     res.send = originalSend;

@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import writeLog from "../utils/writeCsv.js";
+import writeLogCsv from "../utils/writeLogCsv.js";
 
 const terminationLogger = async (err) => {
   const dirname = path.dirname(new URL(import.meta.url).pathname);
@@ -20,7 +20,7 @@ const terminationLogger = async (err) => {
     },
   ];
 
-  await writeLog({ filePath: serverErrorfilePath, log: log });
+  await writeLogCsv({ filePath: serverErrorfilePath, log: log });
 
   process.exit(1);
 };
