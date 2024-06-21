@@ -1,11 +1,20 @@
-import express from "express";
 import dotenv from "dotenv";
-import api from "./src/api/api.js";
-
 dotenv.config();
-const app = express();
 
-app.use(express.json());
-app.use("/", api);
+import express from "express";
+import api from "./src/api/api.js";
+import logger from "./src/logger/logger.js";
+import terminationLogger from "./src/logger/terminationLogger.js";
 
-app.listen(8000, () => {});
+const server = express();
+
+server.use(logger);
+
+server.use(express.json());
+server.use("/", api);
+
+server.listen(8000, () => {
+  console.log(`8000번 포트로 실행 중`);
+});
+
+process.on("uncaughtException", terminationLogger);
