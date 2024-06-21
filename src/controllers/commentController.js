@@ -4,9 +4,9 @@ const commentController = {
   get: async (req, res, next) => {
     try {
       const result = await commentService.selectComments(req, res);
-      res.status(200).send(result);
+      return res.status(200).send(result);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   },
   post: async (req, res, next) => {
@@ -14,31 +14,31 @@ const commentController = {
       const result = await commentService.insert(req, res);
       res.status(200).send(result);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   },
   postReply: async (req, res, next) => {
     try {
       const result = await commentService.insertReply(req, res);
-      res.status(200).send(result);
+      return res.status(200).send(result);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   },
   put: async (req, res, next) => {
     try {
       const result = await commentService.update(req, res);
-      res.status(200).send(result);
+      return res.status(200).send(result);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   },
   delete: async (req, res, next) => {
     try {
       const result = await commentService.delete(req, res);
-      res.status(200).send(result);
+      return res.status(200).send(result);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   },
 };
