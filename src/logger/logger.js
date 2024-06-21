@@ -3,8 +3,6 @@ import fs from "fs";
 import jwtVerify from "../utils/jwtVerify.js";
 import writeLog from "../utils/writeCsv.js";
 
-// process.on("uncaughtException", (err) => {});
-
 const logger = (req, res, next) => {
   const originalSend = res.send;
   const start = performance.now();
@@ -32,9 +30,9 @@ const logger = (req, res, next) => {
         reqQuery: JSON.stringify(req.query),
         resMessage: body.message || null,
         resResult: body.result || null,
-        log: body.stack,
         responseTime: (performance.now() - start).toFixed(2) + "ms",
         createdAt: new Date(),
+        errStack: body.stack,
       },
     ];
 
