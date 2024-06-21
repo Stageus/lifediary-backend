@@ -5,7 +5,7 @@ import CONSTANTS from "../utils/constansts.js";
 const validator = (schema) => async (req, res, next) => {
   try {
     const errors = (await checkSchema(schema).run(req)).reduce((prev, curElement) => {
-      return prev.concat([...curElement.errors]);
+      return prev.concat(curElement.errors);
     }, []);
 
     if (errors.length > 0) {
