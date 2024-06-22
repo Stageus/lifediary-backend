@@ -13,10 +13,7 @@ const noticeModel = {
           INSERT INTO notice (noticeTypeIdx, fromAccountIdx, toAccountIdx, diaryIdx)
           SELECT $1, $2, getDiaryOwner.accountIdx, $3
           FROM getDiaryOwner
-          WHERE EXISTS (
-            SELECT accountIdx
-            FROM getToAccountIdx
-          );
+          WHERE EXISTS ( SELECT accountIdx FROM getDiaryOwner );
         `,
         values: [noticeType, fromAccountIdx, diaryIdx],
       };

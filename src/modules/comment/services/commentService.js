@@ -28,15 +28,22 @@ const commentService = {
 
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
-    const result = await psqlConnect.transaction([
-      commentModel.insert({ diaryIdx: diaryIdx, accountIdx: accountIdx, textContent: textContent }),
-      diaryModel.updateCommentCnt({ diaryIdx: diaryIdx, isPlus: true }),
-      noticeModel.insertNotice({
-        fromAccountIdx: accountIdx,
-        diaryIdx: diaryIdx,
-        noticeType: CONSTANTS.NOTICE_TYPE.NEW_COMMENT,
-      }),
-    ]);
+    const queries = [
+      commentModel.insert({ diaryIdx, accountIdx, textContent }),
+      diaryModel.updateCommentCnt({ diaryIdx, isPlus: true }),
+    ];
+
+    // if comment my diary -> no notice
+    if (check.rows[0].accountIdx !== accountIdx)
+      queries.push(
+        noticeModel.insertNotice({
+          fromAccountIdx: accountIdx,
+          diaryIdx,
+          noticeType: CONSTANTS.NOTICE_TYPE.NEW_COMMENT,
+        })
+      );
+
+    const result = await psqlConnect.transaction(queries);
 
     return result.rows;
   },
