@@ -13,6 +13,8 @@ const noticeService = {
 
     if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
+    await psqlConnect.query(noticeModel.updateRead({ toAccountIdx: accountIdx }));
+
     return result.rows;
   },
   selectIsNew: async (req, res) => {

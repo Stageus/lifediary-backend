@@ -23,7 +23,7 @@ const noticeModel = {
         FROM notice AS n
         JOIN account AS a ON n.fromAccountIdx = a.idx
         WHERE n.toAccountIdx = $1
-        ORDER BY n.createdAt ASC
+        ORDER BY n.createdAt DESC
         LIMIT $2 OFFSET $3
       `,
       values: [toAccountIdx, CONSTANTS.RULE.NOTICE_PAGE_LIMIT, CONSTANTS.RULE.NOTICE_PAGE_LIMIT * (page - 1)],
@@ -61,6 +61,16 @@ const noticeModel = {
     return {
       sql: ``,
       values: [fromAccountIdx, toAccountIdx, diaryIdx, noticeType],
+    };
+  },
+  updateRead: ({ toAccountIdx }) => {
+    return {
+      sql: `
+        UPDATE notice
+        SET isRead = true
+        WHERE toAccountIdx = $1
+      `,
+      values: [toAccountIdx],
     };
   },
   delete: ({ noticeIdx, toAccountIdx }) => {
