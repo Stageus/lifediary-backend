@@ -1,10 +1,10 @@
-import commentModel from "../models/commentModel.js";
-import diaryModel from "../models/diaryModel.js";
-import noticeModel from "../models/noticeModel.js";
-import CONSTANTS from "../utils/constansts.js";
-import jwt from "../utils/jwt.js";
-import psqlConnect from "../utils/psqlConnect.js";
-import sendError from "../utils/sendError.js";
+import commentModel from "../../../shared/models/commentModel.js";
+import diaryModel from "../../../shared/models/diaryModel.js";
+import noticeModel from "../../../shared/models/noticeModel.js";
+import CONSTANTS from "../../../shared/utils/constansts.js";
+import jwt from "../../../shared/utils/jwt.js";
+import psqlConnect from "../../../shared/utils/psqlConnect.js";
+import sendError from "../../../shared/utils/sendError.js";
 
 const commentService = {
   selectComments: async (req, res) => {

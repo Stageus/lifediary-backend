@@ -5,7 +5,7 @@ import writeLogCsv from "../utils/writeLogCsv.js";
 const terminationLogger = async (err) => {
   const dirname = path.dirname(new URL(import.meta.url).pathname);
   const curDate = new Date().toISOString().slice(0, 10);
-  const logDir = path.join(dirname, `../../logs/${curDate}`);
+  const logDir = path.join(dirname, `../../../logs/${curDate}`);
   if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
 
   const serverErrorfilePath = path.join(logDir, `serverError.csv`);

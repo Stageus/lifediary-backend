@@ -1,7 +1,7 @@
 import axios from "axios";
-import accountModel from "../models/accountModel.js";
-import jwt from "../utils/jwt.js";
-import psqlConnect from "../utils/psqlConnect.js";
+import accountModel from "../../../shared/models/accountModel.js";
+import jwt from "../../../shared/utils/jwt.js";
+import psqlConnect from "../../../shared/utils/psqlConnect.js";
 
 const accountService = {
   getRedirectUrl: (req, res) => {
