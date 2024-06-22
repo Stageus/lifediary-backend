@@ -4,7 +4,8 @@ const commentModel = {
   selectDiaryOwnerIdx: ({ parentCommentIdx }) => {
     return {
       sql: `
-        SELECT c.parentCommentIdx, d.accountIdx AS "accountIdx"
+        SELECT  
+          d.accountIdx AS "accountIdx"
         FROM comment AS c
         JOIN diary AS d ON d.idx = c.diaryIdx
         WHERE c.idx = $1
