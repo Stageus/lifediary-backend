@@ -36,7 +36,7 @@ const commentService = {
     // if comment my diary -> no notice
     if (check.rows[0].accountIdx !== accountIdx)
       queries.push(
-        noticeModel.insertNotice({
+        noticeModel.insert({
           fromAccountIdx: accountIdx,
           diaryIdx,
           noticeType: CONSTANTS.NOTICE_TYPE.NEW_COMMENT,
