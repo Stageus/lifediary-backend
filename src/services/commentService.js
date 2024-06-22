@@ -14,7 +14,7 @@ const commentService = {
         accountIdx: accountIdx,
         page: page,
       })
-      .catch(() =>
+      .catch((err) =>
         sendError({
           status: 500,
           message: CONSTANTS.MSG[500],
@@ -38,7 +38,7 @@ const commentService = {
         accountIdx: accountIdx,
         textContent: textContent,
       })
-      .catch(() =>
+      .catch((err) =>
         sendError({
           status: 500,
           message: CONSTANTS.MSG[500],
@@ -60,7 +60,7 @@ const commentService = {
       .selectDiaryOwnerIdx({
         parentCommentIdx: parentCommentIdx,
       })
-      .catch(() =>
+      .catch((err) =>
         sendError({
           status: 500,
           message: CONSTANTS.MSG[500],
@@ -79,7 +79,7 @@ const commentService = {
         textContent: textContent,
         parentCommentIdx: parentCommentIdx,
       })
-      .catch(() =>
+      .catch((err) =>
         sendError({
           status: 500,
           message: CONSTANTS.MSG[500],
@@ -98,7 +98,7 @@ const commentService = {
       .selectCommentOwnerIdx({
         commentIdx: commentIdx,
       })
-      .catch(() =>
+      .catch((err) =>
         sendError({
           status: 500,
           message: CONSTANTS.MSG[500],
@@ -117,7 +117,13 @@ const commentService = {
         accountIdx: accountIdx,
         textContent: textContent,
       })
-      .catch(() => sendError({ status: 500, message: CONSTANTS.MSG[500] }));
+      .catch((err) =>
+        sendError({
+          status: 500,
+          message: CONSTANTS.MSG[500],
+          stack: err.stack,
+        })
+      );
 
     return result.rows;
   },
@@ -129,7 +135,7 @@ const commentService = {
       .selectCommentOwnerIdx({
         commentIdx: commentIdx,
       })
-      .catch(() =>
+      .catch((err) =>
         sendError({
           status: 500,
           message: CONSTANTS.MSG[500],
