@@ -15,8 +15,6 @@ const diaryModel = {
   selectLikeTab: () => {},
   selectMineTab: () => {},
   selectGrass: ({ accountIdx, year }) => {
-    const today = new Date();
-    const lastYear = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
     return {
       sql: `
         WITH dates AS (
@@ -28,8 +26,8 @@ const diaryModel = {
                 DATE '${new Date(year, 11, 31).toISOString().slice(0, 10)}', 
               `
                 : `
-              DATE '${lastYear.toISOString().slice(0, 10)}', 
-              DATE '${today.toISOString().slice(0, 10)}',
+                CURRENT_DATE - INTERVAL '1 year', 
+                CURRENT_DATE,
               `
             }
             INTERVAL '1 day'
