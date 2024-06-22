@@ -22,8 +22,8 @@ const diaryModel = {
             ${
               year
                 ? `
-                DATE '${new Date(year, 0, 1).toISOString().slice(0, 10)}',
-                DATE '${new Date(year, 11, 31).toISOString().slice(0, 10)}', 
+                DATE '${year - 1}-01-01',
+                DATE '${year}-01-01', 
               `
                 : `
                 CURRENT_DATE - INTERVAL '1 year', 
