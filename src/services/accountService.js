@@ -1,6 +1,7 @@
 import axios from "axios";
 import accountModel from "../models/accountModel.js";
-import jwtSign from "../utils/jwtSign.js";
+import jwt from "../utils/jwt.js";
+import psqlConnect from "../utils/psqlConnect.js";
 
 const accountService = {
   getRedirectUrl: (req, res) => {
@@ -31,12 +32,12 @@ const accountService = {
     });
 
     let result = {};
-    const account = accountModel.selectFromGoogleId({
-      id: googleAccountInfo.data.id,
-    });
+    const account = await psqlConnect.query(
+      accountModel.selectFromGoogleId({ oauthGoogleId: googleAccountInfo.data.id })
+    );
 
     if (account) {
-      const token = jwtSign({
+      const token = jwt.sign({
         profileImg: account.profileImg,
         idx: account.idx,
         permission: account.permission,

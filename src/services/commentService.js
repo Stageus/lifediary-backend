@@ -1,165 +1,90 @@
 import commentModel from "../models/commentModel.js";
+import diaryModel from "../models/diaryModel.js";
+import noticeModel from "../models/noticeModel.js";
 import CONSTANTS from "../utils/constansts.js";
-import jwtVerify from "../utils/jwtVerify.js";
+import jwt from "../utils/jwt.js";
+import psqlConnect from "../utils/psqlConnect.js";
 import sendError from "../utils/sendError.js";
 
 const commentService = {
   selectComments: async (req, res) => {
     const { page, diaryIdx } = req.query;
-    const { accountIdx } = jwtVerify(req.headers.token);
+    const { accountIdx } = jwt.verify(req.headers.token);
 
-    const result = await commentModel
-      .selectList({
-        diaryIdx: diaryIdx,
-        accountIdx: accountIdx,
-        page: page,
-      })
-      .catch((err) =>
-        sendError({
-          status: 500,
-          message: CONSTANTS.MSG[500],
-          stack: err.stack,
-        })
-      );
+    const result = await psqlConnect.query(
+      commentModel.selectList({ diaryIdx: diaryIdx, accountIdx: accountIdx, page: page })
+    );
 
-    if (result.rowCount === 0)
-      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
     return result.rows;
   },
   insert: async (req, res) => {
     const { diaryIdx } = req.query;
     const { textContent } = req.body;
-    const { accountIdx } = jwtVerify(req.headers.token);
+    const { accountIdx } = jwt.verify(req.headers.token);
 
-    const result = await commentModel
-      .insert({
+    const check = await psqlConnect.query(diaryModel.select({ diaryIdx: diaryIdx }));
+
+    if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
+
+    const result = await psqlConnect.transaction([
+      commentModel.insert({ diaryIdx: diaryIdx, accountIdx: accountIdx, textContent: textContent }),
+      diaryModel.updateCommentCnt({ diaryIdx: diaryIdx, isPlus: true }),
+      noticeModel.insertNotice({
+        fromAccountIdx: accountIdx,
         diaryIdx: diaryIdx,
-        accountIdx: accountIdx,
-        textContent: textContent,
-      })
-      .catch((err) =>
-        sendError({
-          status: 500,
-          message: CONSTANTS.MSG[500],
-          stack: err.stack,
-        })
-      );
-
-    if (result.rowCount === 0)
-      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+        noticeType: CONSTANTS.NOTICE_TYPE.NEW_COMMENT,
+      }),
+    ]);
 
     return result.rows;
   },
   insertReply: async (req, res) => {
     const { parentCommentIdx } = req.params;
     const { textContent } = req.body;
-    const { accountIdx } = jwtVerify(req.headers.token);
+    const { accountIdx } = jwt.verify(req.headers.token);
 
-    const check = await commentModel
-      .selectDiaryOwnerIdx({
-        parentCommentIdx: parentCommentIdx,
-      })
-      .catch((err) =>
-        sendError({
-          status: 500,
-          message: CONSTANTS.MSG[500],
-          stack: err.stack,
-        })
-      );
+    const check = await psqlConnect.query(commentModel.selectDiaryOwnerIdx({ parentCommentIdx: parentCommentIdx }));
 
-    if (check.rowCount === 0)
-      sendError({ status: 404, message: CONSTANTS.MSG[404] });
-    if (check.rows[0].accountIdx !== accountIdx)
-      sendError({ status: 403, message: CONSTANTS.MSG[403] });
+    if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
-    const result = await commentModel
-      .insertReply({
-        accountIdx: accountIdx,
-        textContent: textContent,
-        parentCommentIdx: parentCommentIdx,
-      })
-      .catch((err) =>
-        sendError({
-          status: 500,
-          message: CONSTANTS.MSG[500],
-          stack: err.stack,
-        })
-      );
+    const result = await psqlConnect.query(
+      commentModel.insertReply({ accountIdx: accountIdx, textContent: textContent, parentCommentIdx: parentCommentIdx })
+    );
 
     return result.rows;
   },
   update: async (req, res) => {
     const { commentIdx } = req.params;
     const { textContent } = req.body;
-    const { accountIdx } = jwtVerify(req.headers.token);
+    const { accountIdx } = jwt.verify(req.headers.token);
 
-    const check = await commentModel
-      .selectCommentOwnerIdx({
-        commentIdx: commentIdx,
-      })
-      .catch((err) =>
-        sendError({
-          status: 500,
-          message: CONSTANTS.MSG[500],
-          stack: err.stack,
-        })
-      );
+    const check = await psqlConnect.query(commentModel.selectCommentOwnerIdx({ commentIdx: commentIdx }));
 
-    if (check.rowCount === 0)
-      sendError({ status: 404, message: CONSTANTS.MSG[404] });
-    if (check.rows[0].accountIdx !== accountIdx)
-      sendError({ status: 403, message: CONSTANTS.MSG[403] });
+    if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
-    const result = await commentModel
-      .update({
-        commentIdx: commentIdx,
-        accountIdx: accountIdx,
-        textContent: textContent,
-      })
-      .catch((err) =>
-        sendError({
-          status: 500,
-          message: CONSTANTS.MSG[500],
-          stack: err.stack,
-        })
-      );
+    const result = await psqlConnect.query(
+      commentModel.update({ commentIdx: commentIdx, accountIdx: accountIdx, textContent: textContent })
+    );
 
     return result.rows;
   },
   delete: async (req, res) => {
     const { commentIdx } = req.params;
-    const { accountIdx } = jwtVerify(req.headers.token);
+    const { accountIdx } = jwt.verify(req.headers.token);
 
-    const check = await commentModel
-      .selectCommentOwnerIdx({
-        commentIdx: commentIdx,
-      })
-      .catch((err) =>
-        sendError({
-          status: 500,
-          message: CONSTANTS.MSG[500],
-          stack: err.stack,
-        })
-      );
+    const check = await psqlConnect.query(commentModel.selectCommentOwnerIdx({ commentIdx: commentIdx }));
 
-    if (check.rowCount === 0)
-      sendError({ status: 404, message: CONSTANTS.MSG[404] });
-    if (check.rows[0].accountIdx !== accountIdx)
-      sendError({ status: 403, message: CONSTANTS.MSG[403] });
+    if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
-    const result = await commentModel
-      .delete({
-        commentIdx: commentIdx,
-        accountIdx: accountIdx,
-      })
-      .catch((err) =>
-        sendError({
-          status: 500,
-          message: CONSTANTS.MSG[500],
-          stack: err.stack,
-        })
-      );
+    const result = await psqlConnect.transaction([
+      commentModel.delete({ commentIdx: commentIdx, accountIdx: accountIdx }),
+      diaryModel.updateCommentCnt({ commentIdx: commentIdx, isPlus: false }),
+    ]);
 
     return result.rows;
   },

@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
-import jwtVerify from "../utils/jwtVerify.js";
 import writeLogCsv from "../utils/writeLogCsv.js";
+import jwt from "../utils/jwt.js";
 
 const logger = (req, res, next) => {
   const originalSend = res.send;
@@ -24,7 +24,7 @@ const logger = (req, res, next) => {
         status: res.statusCode,
         method: req.method,
         url: req.url,
-        accountIdx: jwtVerify(req.headers.token).accountIdx,
+        accountIdx: jwt.verify(req.headers.token).accountIdx,
         reqParams: JSON.stringify(req.params),
         reqBody: JSON.stringify(req.body),
         reqQuery: JSON.stringify(req.query),
@@ -38,10 +38,8 @@ const logger = (req, res, next) => {
 
     await Promise.all([
       writeLogCsv({ filePath: filePath.all, log: log }),
-      res.statusCode.toString().startsWith("4") &&
-        writeLogCsv({ filePath: filePath.clientError, log: log }),
-      res.statusCode.toString().startsWith("5") &&
-        writeLogCsv({ filePath: filePath.serverError, log: log }),
+      res.statusCode.toString().startsWith("4") && writeLogCsv({ filePath: filePath.clientError, log: log }),
+      res.statusCode.toString().startsWith("5") && writeLogCsv({ filePath: filePath.serverError, log: log }),
     ]);
 
     res.send = originalSend;
