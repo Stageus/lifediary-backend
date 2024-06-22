@@ -24,7 +24,7 @@ const commentService = {
     const { textContent } = req.body;
     const { accountIdx } = jwt.verify(req.headers.token);
 
-    const check = await psqlConnect.query(diaryModel.select({ diaryIdx: diaryIdx }));
+    const check = await psqlConnect.query(diaryModel.selectAccountIdx({ diaryIdx: diaryIdx }));
 
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
