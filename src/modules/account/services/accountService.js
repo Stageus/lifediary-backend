@@ -32,9 +32,10 @@ const accountService = {
     });
 
     let result = {};
-    const account = await psqlConnect.query(
+    const selectedRows = await psqlConnect.query(
       accountModel.selectFromGoogleId({ oauthGoogleId: googleAccountInfo.data.id })
     );
+    const account = selectedRows.rows[0];
 
     if (account) {
       const token = jwt.sign({
@@ -54,7 +55,62 @@ const accountService = {
 
     return result;
   },
-  insertAccount: () => {},
+
+  selectIdx: async (req, res) => {
+    const { idx } = jwt.verify(req.headers.token);
+
+    const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ idx: idx }));
+    const account = selectedRows.rows[0];
+
+    return account;
+  },
+  insertAccount: async (req, res) => {
+    const { profileImg, nickname, oauthGoogleId } = req.body;
+
+    const insertedRows = await psqlConnect.query(
+      accountModel.insert({ oauthGoogleId: oauthGoogleId, nickname: nickname, profileImg: profileImg })
+    );
+    const account = insertedRows.rows[0];
+
+    const token = jwt.sign({
+      profileImg: account.profileImg,
+      idx: account.idx,
+      permission: account.permission,
+    });
+
+    return { token: token };
+  },
+  updateNickname: async (req, res) => {
+    const { idx: accountIdx } = jwt.verify(req.headers.token);
+    if (!accountIdx) {
+      sendError({ status: 401, message: CONSTANTS.MSG[404] });
+    }
+    const { nickname } = req.body;
+
+    const selectedRows = await psqlConnect.query(accountModel.selectNickname({ nickname: nickname }));
+    const nicknameAccount = selectedRows.rows[0];
+
+    if (nicknameAccount && nicknameAccount.idx !== accountIdx) {
+      sendError({ status: 409, message: CONSTANTS.MSG[409] });
+    }
+
+    await psqlConnect.query(accountModel.updateNickname({ nickname: nickname, accountIdx: accountIdx }));
+
+    return;
+  },
+  selectNickname: async (req, res) => {
+    const { idx: accountIdx } = jwt.verify(req.headers.token);
+    const { nickname } = req.body;
+
+    const selectedRows = await psqlConnect.query(accountModel.selectNickname({ nickname: nickname }));
+    const nicknameAccount = selectedRows.rows[0];
+
+    if (nicknameAccount && nicknameAccount.idx !== accountIdx) {
+      sendError({ status: 409, message: CONSTANTS.MSG[409] });
+    }
+
+    return;
+  },
   selectAccount: () => {},
   update: () => {},
   delete: () => {},

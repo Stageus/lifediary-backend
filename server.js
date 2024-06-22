@@ -19,7 +19,7 @@ server.use(logger);
 
 server.use(express.json());
 server.use("/account", accountRoute);
-// server.use("/auth", authRoute);
+server.use("/auth", authRoute);
 server.use("/comment", commentRoute);
 // server.use("/diary", diaryRoute);
 // server.use("/grass", grassRoute);
