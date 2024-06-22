@@ -14,6 +14,20 @@ const accountSchema = {
       notEmpty: true,
     },
   },
+  updateNickname: {
+    nickname: {
+      in: ["body"],
+      notEmpty: true,
+      isLength: { options: { max: 20 } },
+    },
+  },
+  getIsNicknameExist: {
+    nickname: {
+      in: ["body"],
+      notEmpty: true,
+      isLength: { options: { max: 20 } },
+    },
+  },
 };
 
 export default accountSchema;

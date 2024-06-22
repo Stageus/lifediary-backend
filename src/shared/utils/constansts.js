@@ -1,6 +1,7 @@
 const CONSTANTS = Object.freeze({
   MSG: Object.freeze({
     500: "something broke",
+    409: "conflict with server",
     404: "no resouce",
     403: "wrong access",
     400: "unvalid value",

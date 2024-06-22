@@ -45,6 +45,15 @@ const accountController = {
       next(err);
     }
   },
+
+  getIsNicknameExist: async (req, res) => {
+    try {
+      await accountService.selectNickname(req, res);
+      res.sendStatus(200);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 export default accountController;

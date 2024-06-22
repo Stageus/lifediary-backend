@@ -30,9 +30,28 @@ const accountModel = {
     };
   },
   delete: () => {},
-  updateNickname: () => {},
+  selectNickname: ({ nickname }) => {
+    return {
+      sql: `
+            SELECT idx
+            FROM account
+            WHERE nickname = $1
+            `,
+      values: [nickname],
+    };
+  },
+  updateNickname: ({ nickname, accountIdx }) => {
+    return {
+      sql: `
+            UPDATE account
+            SET nickname = $1
+            WHERE idx = $2
+            RETURNING idx;
+          `,
+      values: [nickname, accountIdx],
+    };
+  },
   updateProfileImg: () => {},
-  selectNickname: () => {},
 };
 
 export default accountModel;
