@@ -12,6 +12,7 @@ import commentRoute from "./src/modules/comment/routes/commentRoute.js";
 import authRoute from "./src/modules/auth/routes/authRoute.js";
 import logger from "./src/shared/logger/logger.js";
 import terminationLogger from "./src/shared/logger/terminationLogger.js";
+import errorHandler from "./src/shared/middlewares/errorHandler.js";
 
 const server = express();
 
@@ -23,12 +24,14 @@ server.use("/account", accountRoute);
 server.use("/comment", commentRoute);
 // server.use("/diary", diaryRoute);
 // server.use("/grass", grassRoute);
-// server.use("/notice", noticeRoute);
+server.use("/notice", noticeRoute);
 // server.use("/report", reportRoute);
 // server.use("/subscription", subscriptionRoute);
 
 server.listen(8000, () => {
   console.log(`8000번 포트로 실행 중`);
 });
+
+server.use(errorHandler);
 
 process.on("uncaughtException", terminationLogger);
