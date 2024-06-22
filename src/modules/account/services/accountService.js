@@ -4,16 +4,6 @@ import jwt from "../../../shared/utils/jwt.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
 
 const accountService = {
-  getTokenInfo: (req, res) => {
-    const result = jwtVerify(req.headers.token);
-
-    if (!result) {
-      sendError({ status: 401, message: CONSTANTS.MSG[401] });
-    }
-
-    return result;
-  },
-
   getRedirectUrl: (req, res) => {
     let url = "https://accounts.google.com/o/oauth2/v2/auth";
     url += `?client_id=${process.env.GOOGLE_ID}`;
@@ -42,9 +32,10 @@ const accountService = {
     });
 
     let result = {};
-    const account = await psqlConnect.query(
+    const selectedRows = await psqlConnect.query(
       accountModel.selectFromGoogleId({ oauthGoogleId: googleAccountInfo.data.id })
     );
+    const account = selectedRows.rows[0];
 
     if (account) {
       const token = jwt.sign({
@@ -66,13 +57,29 @@ const accountService = {
   },
 
   selectIdx: async (req, res) => {
-    const { idx } = jwtVerify(req.headers.token);
+    const { idx } = jwt.verify(req.headers.token);
 
-    const account = await accountModel.selectFromIdx({ idx: idx });
+    const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ idx: idx }));
+    const account = selectedRows.rows[0];
 
     return account;
   },
-  insertAccount: () => {},
+  insertAccount: async (req, res) => {
+    const { profileImg, nickname, oauthGoogleId } = req.body;
+
+    const insertedRows = await psqlConnect.query(
+      accountModel.insert({ oauthGoogleId: oauthGoogleId, nickname: nickname, profileImg: profileImg })
+    );
+    const account = insertedRows.rows[0];
+
+    const token = jwt.sign({
+      profileImg: account.profileImg,
+      idx: account.idx,
+      permission: account.permission,
+    });
+
+    return { token: token };
+  },
   selectAccount: () => {},
   update: () => {},
   delete: () => {},
