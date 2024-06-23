@@ -2,6 +2,7 @@ import axios from "axios";
 import accountModel from "../../../shared/models/accountModel.js";
 import jwt from "../../../shared/utils/jwt.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
+import sendError from "../../../shared/utils/sendError.js";
 
 const accountService = {
   getRedirectUrl: (req, res) => {
@@ -57,9 +58,12 @@ const accountService = {
   },
 
   selectIdx: async (req, res) => {
-    const { idx } = jwt.verify(req.headers.token);
+    const { idx: accountIdx } = jwt.verify(req.headers.token);
+    if (!accountIdx) {
+      sendError({ status: 401, message: CONSTANTS.MSG[401] });
+    }
 
-    const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ idx: idx }));
+    const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ accountIdx: accountIdx }));
     const account = selectedRows.rows[0];
 
     return account;
@@ -83,7 +87,7 @@ const accountService = {
   updateNickname: async (req, res) => {
     const { idx: accountIdx } = jwt.verify(req.headers.token);
     if (!accountIdx) {
-      sendError({ status: 401, message: CONSTANTS.MSG[404] });
+      sendError({ status: 401, message: CONSTANTS.MSG[401] });
     }
     const { nickname } = req.body;
 
@@ -111,9 +115,27 @@ const accountService = {
 
     return;
   },
+  updateProfileImg: async (req, res) => {
+    const { idx: accountIdx } = jwt.verify(req.headers.token);
+    if (!accountIdx) {
+      sendError({ status: 401, message: CONSTANTS.MSG[401] });
+    }
+
+    await psqlConnect.query(accountModel.updateProfileImg({ profileImg: profileImg, accountIdx: accountIdx }));
+
+    return;
+  },
   selectAccount: () => {},
-  update: () => {},
-  delete: () => {},
+  delete: async (req, res) => {
+    const { idx: accountIdx } = jwt.verify(req.headers.token);
+    if (!accountIdx) {
+      sendError({ status: 401, message: CONSTANTS.MSG[401] });
+    }
+
+    await psqlConnect.query(accountModel.delete({ accountIdx: accountIdx }));
+
+    return;
+  },
 };
 
 export default accountService;

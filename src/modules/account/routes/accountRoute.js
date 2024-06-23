@@ -13,8 +13,8 @@ accountRoute
   //   .get('/:accountIdx', accountController)
   .post("/", validator(accountSchema.signup), accountController.signup)
   .put("/nickname", validator(accountSchema.updateNickname), accountController.updateNickname)
-  .get("/nickname/duplication", validator(accountSchema.getIsNicknameExist), accountController.getIsNicknameExist);
-//   .put('/profileImg', accountController)
-//   .delete('/', accountController)
+  .get("/nickname/duplication", validator(accountSchema.getIsNicknameExist), accountController.getIsNicknameExist)
+  .put("/profileimg", validator(accountSchema.updateProfileImg), accountController.updateProfileImg)
+  .delete("/", accountController.delete);
 
 export default accountRoute;

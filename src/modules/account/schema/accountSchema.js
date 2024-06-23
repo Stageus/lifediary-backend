@@ -28,6 +28,12 @@ const accountSchema = {
       isLength: { options: { max: 20 } },
     },
   },
+  updateProfileImg: {
+    profileImg: {
+      in: ["body"],
+      notEmpty: true,
+    },
+  },
 };
 
 export default accountSchema;

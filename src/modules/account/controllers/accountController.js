@@ -54,6 +54,24 @@ const accountController = {
       next(err);
     }
   },
+
+  updateProfileImg: async (req, res) => {
+    try {
+      await accountService.updateProfileImg(req, res);
+      res.sendStatus(200);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      await accountService.delete(req, res);
+      res.sendStatus(200);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 export default accountController;
