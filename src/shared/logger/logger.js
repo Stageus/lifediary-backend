@@ -1,52 +1,71 @@
+import { createObjectCsvWriter as csvWriter } from "csv-writer";
 import path from "path";
 import fs from "fs";
-import writeLogCsv from "../utils/writeLogCsv.js";
 import jwt from "../utils/jwt.js";
+import CONSTANTS from "../utils/constansts.js";
 
-const logger = (req, res, next) => {
-  const originalSend = res.send;
-  const start = performance.now();
+const logger = (req, res) => {
+  try {
+    const curDate = new Date(Date.now() + 1000 * 60 * 60 * 9).toISOString().slice(0, 10);
+    const curDir = path.dirname(new URL(import.meta.url).pathname);
+    const logDir = path.join(curDir, `../../../logs/${curDate}/`);
 
-  res.send = async function (body) {
-    const dirname = path.dirname(new URL(import.meta.url).pathname);
-    const curDate = new Date().toISOString().slice(0, 10);
-    const logDir = path.join(dirname, `../../../logs/${curDate}`);
-    if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+    fs.mkdirSync(logDir, { recursive: true });
 
-    const filePath = {
-      all: path.join(logDir, `all.csv`),
-      clientError: path.join(logDir, `clientError.csv`),
-      serverError: path.join(logDir, `serverError.csv`),
-    };
+    let accountIdx;
+    try {
+      accountIdx = jwt.verify(req.headers.token).accountIdx;
+    } catch (err) {
+      if (err.status === 401) accountIdx = null;
+    }
 
     const log = [
       {
         status: res.statusCode,
         method: req.method,
-        url: req.url,
-        accountIdx: jwt.verify(req.headers.token).accountIdx,
+        url: req.baseUrl,
+        accountIdx,
         reqParams: JSON.stringify(req.params),
         reqBody: JSON.stringify(req.body),
         reqQuery: JSON.stringify(req.query),
-        resMessage: body && body.message,
-        resResult: body && body.result,
-        responseTime: (performance.now() - start).toFixed(2) + "ms",
+        resMessage: res.locals.modifiedBody.message,
+        resResult: JSON.stringify(res.locals.modifiedBody.result),
+        responseTime: res.locals.responseTime,
         createdAt: new Date(),
-        errStack: body && body.stack,
+        errStack: res.locals.stack,
       },
     ];
 
-    await Promise.all([
-      writeLogCsv({ filePath: filePath.all, log: log }),
-      res.statusCode.toString().startsWith("4") && writeLogCsv({ filePath: filePath.clientError, log: log }),
-      res.statusCode.toString().startsWith("5") && writeLogCsv({ filePath: filePath.serverError, log: log }),
-    ]);
+    const statusCode = res.statusCode.toString();
 
-    res.send = originalSend;
-    return originalSend.call(this, body);
-  };
+    const allCsvPath = path.join(logDir, "all.csv");
+    csvWriter({
+      path: allCsvPath,
+      header: CONSTANTS.LOG_HEADER,
+      append: fs.existsSync(allCsvPath),
+    }).writeRecords(log);
 
-  return next();
+    if (statusCode.startsWith("4")) {
+      const clientErrorCsvPath = path.join(logDir, "clientError.csv");
+      csvWriter({
+        path: clientErrorCsvPath,
+        header: CONSTANTS.LOG_HEADER,
+        append: fs.existsSync(clientErrorCsvPath),
+      }).writeRecords(log);
+    } //
+    else if (statusCode.startsWith("5")) {
+      const serverErrorCsvPath = path.join(logDir, "serverError.csv");
+      csvWriter({
+        path: serverErrorCsvPath,
+        header: CONSTANTS.LOG_HEADER,
+        append: fs.existsSync(serverErrorCsvPath),
+      }).writeRecords(log);
+    }
+
+    return;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export default logger;
