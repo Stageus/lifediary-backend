@@ -6,15 +6,20 @@ import validator from "../../../shared/middlewares/validator.js";
 const accountRoute = express.Router();
 
 accountRoute
-  .get("/login/oauth/google", accountController.getRedirectUrl)
-  .get("/login/oauth/google/redirect", accountController.getIsAccountExist)
+
+  .get("/login/oauth/google", accountController.oauthGoogle)
+  .get("/login/oauth/google/redirect", accountController.oauthGoogleRedirect)
   .get("/", accountController.get)
-  //   .get('/profileImg', accountController)
-  //   .get('/:accountIdx', accountController)
-  .post("/", validator(accountSchema.signup), accountController.signup)
-  .put("/nickname", validator(accountSchema.updateNickname), accountController.updateNickname)
-  .get("/nickname/duplication", validator(accountSchema.getIsNicknameExist), accountController.getIsNicknameExist);
-//   .put('/profileImg', accountController)
-//   .delete('/', accountController)
+  .get("/:accountidx", validator(accountSchema.getOtherAccount), accountController.getOtherAccount)
+  .post("/", validator(accountSchema.post), accountController.post)
+  .put("/nickname", validator(accountSchema.putNickname), accountController.putNickname)
+  .get(
+    "/nickname/duplication",
+    validator(accountSchema.getNicknameDuplication),
+    accountController.getNicknameDuplication
+  )
+  .put("/profileimg", validator(accountSchema.putProfileImg), accountController.putProfileImg)
+  .delete("/", accountController.delete);
+
 
 export default accountRoute;

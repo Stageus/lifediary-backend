@@ -1,18 +1,18 @@
 import accountService from "../services/accountService.js";
 
 const accountController = {
-  getRedirectUrl: (req, res) => {
+  oauthGoogle: (req, res) => {
     try {
-      const result = accountService.getRedirectUrl(req, res);
+      const result = accountService.oauthGoogle(req, res);
       res.status(200).send(result);
     } catch (err) {
       next(err);
     }
   },
 
-  getIsAccountExist: (req, res) => {
+  oauthGoogleRedirect: (req, res) => {
     try {
-      const result = accountService.selectOauthGoogleId(req, res);
+      const result = accountService.oauthGoogleRedirect(req, res);
       res.status(200).send(result);
     } catch (err) {
       next(err);
@@ -21,35 +21,62 @@ const accountController = {
 
   get: async (req, res) => {
     try {
-      const result = await accountService.selectIdx(req, res);
+      const result = await accountService.get(req, res);
       res.status(200).send(result);
     } catch (err) {
       next(err);
     }
   },
 
-  signup: async (req, res) => {
+  post: async (req, res) => {
     try {
-      const result = await accountService.insertAccount(req, res);
+      const result = await accountService.post(req, res);
       res.status(200).send(result);
     } catch (err) {
       next(err);
     }
   },
 
-  updateNickname: async (req, res) => {
+  putNickname: async (req, res) => {
     try {
-      await accountService.updateNickname(req, res);
+      await accountService.putNickname(req, res);
       res.sendStatus(200);
     } catch (err) {
       next(err);
     }
   },
 
-  getIsNicknameExist: async (req, res) => {
+  getNicknameDuplication: async (req, res) => {
     try {
-      await accountService.selectNickname(req, res);
+      const result = await accountService.getNicknameDuplication(req, res);
+      res.status(200).send(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  putProfileImg: async (req, res) => {
+    try {
+      await accountService.putProfileImg(req, res);
       res.sendStatus(200);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      await accountService.delete(req, res);
+      res.sendStatus(200);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  getOtherAccount: async (req, res) => {
+    try {
+      const result = await accountService.getOtherAccount(req, res);
+      res.status(200).send(result);
     } catch (err) {
       next(err);
     }

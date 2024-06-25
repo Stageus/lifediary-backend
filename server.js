@@ -13,6 +13,7 @@ import logger from "./src/shared/logger/logger.js";
 import terminationLogger from "./src/shared/logger/terminationLogger.js";
 import errorHandler from "./src/shared/middlewares/errorHandler.js";
 import grassRoute from "./src/modules/grass/routes/grassRoute.js.js";
+import exceptionHandler from "./src/shared/middlewares/exceptionHandler.js";
 
 const server = express();
 
@@ -27,11 +28,11 @@ server.use("/grass", grassRoute);
 server.use("/notice", noticeRoute);
 // server.use("/report", reportRoute);
 // server.use("/subscription", subscriptionRoute);
+server.use("/", exceptionHandler);
+server.use(errorHandler);
 
 server.listen(8000, () => {
   console.log(`8000번 포트로 실행 중`);
 });
-
-server.use(errorHandler);
 
 process.on("uncaughtException", terminationLogger);

@@ -8,7 +8,7 @@ const accountModel = {
       values: [profileImg, nickname, "user", oauthGoogleId],
     };
   },
-  select: () => {},
+
   selectFromGoogleId: ({ oauthGoogleId }) => {
     return {
       sql: `
@@ -19,17 +19,30 @@ const accountModel = {
       values: [oauthGoogleId],
     };
   },
-  selectFromIdx: ({ idx }) => {
+
+  selectFromIdx: ({ accountIdx }) => {
     return {
       sql: `
             SELECT nickname, profileImg AS "profileImg", subscribeCnt AS "subscribeCnt", diaryCnt AS "diaryCnt"
             FROM account
             WHERE idx = $1 
             `,
-      values: [idx],
+
+      values: [accountIdx],
     };
   },
-  delete: () => {},
+  
+  delete: ({ accountIdx }) => {
+    return {
+      sql: `
+          DELETE 
+          FROM account
+          WHERE idx = $1
+          `,
+      values: [accountIdx],
+    };
+  },
+
   selectNickname: ({ nickname }) => {
     return {
       sql: `
@@ -40,6 +53,7 @@ const accountModel = {
       values: [nickname],
     };
   },
+  
   updateNickname: ({ nickname, accountIdx }) => {
     return {
       sql: `
@@ -51,7 +65,19 @@ const accountModel = {
       values: [nickname, accountIdx],
     };
   },
-  updateProfileImg: () => {},
+
+  updateProfileImg: ({ profileImg, accountIdx }) => {
+    return {
+      sql: `
+            UPDATE account
+            SET profileImg = $1
+            WHERE idx = $2
+            RETURNING idx;
+          `,
+      values: [profileImg, accountIdx],
+    };
+  },
+
 };
 
 export default accountModel;

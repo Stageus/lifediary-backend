@@ -1,5 +1,6 @@
 const accountSchema = {
-  signup: {
+
+  post: {
     oauthGoogleId: {
       in: ["body"],
       notEmpty: true,
@@ -14,20 +15,37 @@ const accountSchema = {
       notEmpty: true,
     },
   },
-  updateNickname: {
+
+  putNickname: {
     nickname: {
       in: ["body"],
       notEmpty: true,
       isLength: { options: { max: 20 } },
     },
   },
-  getIsNicknameExist: {
+  
+  getNicknameDuplication: {
     nickname: {
       in: ["body"],
       notEmpty: true,
       isLength: { options: { max: 20 } },
     },
   },
+
+  putProfileImg: {
+    profileImg: {
+      in: ["body"],
+      notEmpty: true,
+    },
+  },
+  getOtherAccount: {
+    accountIdx: {
+      in: ["param"],
+      notEmpty: true,
+      isInt: true,
+    },
+  },
+
 };
 
 export default accountSchema;
