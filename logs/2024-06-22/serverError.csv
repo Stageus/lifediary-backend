@@ -1,0 +1,136 @@
+STATUS,METHOD,URL,ACCOUNT_IDX,REQ_PARAMS,REQ_BODY,REQ_QUERY,RES_MESSAGE,RESPONSE_TIME,CREATED_AT,LOG
+500,,,,,,,Request failed with status code 400,,Sat Jun 22 2024 15:08:49 GMT+0900 (대한민국 표준시),"AxiosError: Request failed with status code 400
+    at settle (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/node_modules/axios/lib/core/settle.js:19:12)
+    at Unzip.handleStreamEnd (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/node_modules/axios/lib/adapters/http.js:589:11)
+    at Unzip.emit (node:events:531:35)
+    at endReadableNT (node:internal/streams/readable:1696:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+    at Axios.request (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/node_modules/axios/lib/core/Axios.js:45:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:20:25)"
+500,,,,,,,Cannot read properties of undefined (reading '0'),,Sat Jun 22 2024 15:10:07 GMT+0900 (대한민국 표준시),"TypeError: Cannot read properties of undefined (reading '0')
+    at Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:37:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,Cannot read properties of undefined (reading '0'),,Sat Jun 22 2024 15:10:38 GMT+0900 (대한민국 표준시),"TypeError: Cannot read properties of undefined (reading '0')
+    at Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:37:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,Cannot read properties of undefined (reading '0'),,Sat Jun 22 2024 15:16:03 GMT+0900 (대한민국 표준시),"TypeError: Cannot read properties of undefined (reading '0')
+    at Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:37:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,Cannot read properties of undefined (reading '0'),,Sat Jun 22 2024 15:16:51 GMT+0900 (대한민국 표준시),"TypeError: Cannot read properties of undefined (reading '0')
+    at Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:38:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,Cannot read properties of undefined (reading '0'),,Sat Jun 22 2024 15:17:49 GMT+0900 (대한민국 표준시),"TypeError: Cannot read properties of undefined (reading '0')
+    at Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:38:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,Cannot read properties of undefined (reading '0'),,Sat Jun 22 2024 15:18:38 GMT+0900 (대한민국 표준시),"TypeError: Cannot read properties of undefined (reading '0')
+    at Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:38:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,Cannot read properties of undefined (reading '0'),,Sat Jun 22 2024 15:19:58 GMT+0900 (대한민국 표준시),"TypeError: Cannot read properties of undefined (reading '0')
+    at Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:38:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,Cannot read properties of undefined (reading '0'),,Sat Jun 22 2024 15:24:30 GMT+0900 (대한민국 표준시),"TypeError: Cannot read properties of undefined (reading '0')
+    at Object.selectOauthGoogleId (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/services/accountService.js:38:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 16:15:45 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at get (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 16:16:00 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at get (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 16:17:31 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at get (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 16:18:17 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at get (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 16:45:30 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at signup (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:36:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 16:45:47 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at signup (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:36:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 16:46:54 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at signup (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:36:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 16:47:43 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at signup (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:36:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:09:38 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:11:55 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:12:11 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:13:16 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:13:41 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:14:02 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:14:26 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:46:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:14:55 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:15:22 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:16:44 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:18:11 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:18:28 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:18:53 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:22:41 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:23:16 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:23:36 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:23:58 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:24:22 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:25:10 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:25:35 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:29:04 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:29:17 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 20:30:26 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at updateNickname (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:45:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 21:00:43 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at getIsNicknameExist (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:54:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 21:00:54 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at getIsNicknameExist (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:54:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+500,,,,,,,next is not defined,,Sat Jun 22 2024 21:01:40 GMT+0900 (대한민국 표준시),"ReferenceError: next is not defined
+    at getIsNicknameExist (file:///Users/gim-yeongseon/LifeDiary/lifediary-backend/src/modules/account/controllers/accountController.js:54:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
