@@ -58,9 +58,8 @@ const accountService = {
     return result;
   },
 
-
   get: async (req, res) => {
-    const { idx: accountIdx } = jwt.verify(req.headers.token);
+    const { accountIdx } = jwt.verify(req.headers.token);
     if (!accountIdx) {
       sendError({ status: 401, message: CONSTANTS.MSG[401] });
     }
@@ -107,7 +106,6 @@ const accountService = {
     return;
   },
 
-
   getNicknameDuplication: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
 
@@ -115,7 +113,6 @@ const accountService = {
 
     const selectedRows = await psqlConnect.query(accountModel.selectNickname({ nickname: nickname }));
     const nicknameAccount = selectedRows.rows[0];
-
 
     const result = { duplication: false };
     if (nicknameAccount && nicknameAccount.idx !== accountIdx) {
@@ -172,7 +169,6 @@ const accountService = {
 
     return result;
   },
-
 };
 
 export default accountService;

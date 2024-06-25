@@ -4,6 +4,7 @@ const CONSTANTS = Object.freeze({
     409: "conflict with server",
     404: "no resouce",
     403: "wrong access",
+    401: "token error",
     400: "unvalid value",
   }),
   RULE: Object.freeze({
