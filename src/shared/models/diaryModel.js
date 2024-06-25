@@ -3,7 +3,7 @@ const diaryModel = {
   select: ({ diaryIdx }) => {
     return {
       sql: `
-          SELECT 1 FROM diary
+          SELECT accountIdx AS "accountIdx" FROM diary
           WHERE idx = $1
         `,
       values: [diaryIdx],

@@ -6,6 +6,7 @@ import validator from "../../../shared/middlewares/validator.js";
 const accountRoute = express.Router();
 
 accountRoute
+
   .get("/login/oauth/google", accountController.oauthGoogle)
   .get("/login/oauth/google/redirect", accountController.oauthGoogleRedirect)
   .get("/", accountController.get)
@@ -19,5 +20,6 @@ accountRoute
   )
   .put("/profileimg", validator(accountSchema.putProfileImg), accountController.putProfileImg)
   .delete("/", accountController.delete);
+
 
 export default accountRoute;

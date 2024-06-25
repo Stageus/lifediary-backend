@@ -1,4 +1,5 @@
 const accountSchema = {
+
   post: {
     oauthGoogleId: {
       in: ["body"],
@@ -14,6 +15,7 @@ const accountSchema = {
       notEmpty: true,
     },
   },
+
   putNickname: {
     nickname: {
       in: ["body"],
@@ -21,6 +23,7 @@ const accountSchema = {
       isLength: { options: { max: 20 } },
     },
   },
+  
   getNicknameDuplication: {
     nickname: {
       in: ["body"],
@@ -28,6 +31,7 @@ const accountSchema = {
       isLength: { options: { max: 20 } },
     },
   },
+
   putProfileImg: {
     profileImg: {
       in: ["body"],
@@ -41,6 +45,7 @@ const accountSchema = {
       isInt: true,
     },
   },
+
 };
 
 export default accountSchema;

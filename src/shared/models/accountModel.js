@@ -8,6 +8,7 @@ const accountModel = {
       values: [profileImg, nickname, "user", oauthGoogleId],
     };
   },
+
   selectFromGoogleId: ({ oauthGoogleId }) => {
     return {
       sql: `
@@ -18,6 +19,7 @@ const accountModel = {
       values: [oauthGoogleId],
     };
   },
+
   selectFromIdx: ({ accountIdx }) => {
     return {
       sql: `
@@ -25,9 +27,11 @@ const accountModel = {
             FROM account
             WHERE idx = $1 
             `,
+
       values: [accountIdx],
     };
   },
+  
   delete: ({ accountIdx }) => {
     return {
       sql: `
@@ -38,6 +42,7 @@ const accountModel = {
       values: [accountIdx],
     };
   },
+
   selectNickname: ({ nickname }) => {
     return {
       sql: `
@@ -48,6 +53,7 @@ const accountModel = {
       values: [nickname],
     };
   },
+  
   updateNickname: ({ nickname, accountIdx }) => {
     return {
       sql: `
@@ -59,6 +65,7 @@ const accountModel = {
       values: [nickname, accountIdx],
     };
   },
+
   updateProfileImg: ({ profileImg, accountIdx }) => {
     return {
       sql: `
@@ -70,6 +77,7 @@ const accountModel = {
       values: [profileImg, accountIdx],
     };
   },
+
 };
 
 export default accountModel;
