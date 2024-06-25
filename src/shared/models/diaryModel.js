@@ -36,8 +36,7 @@ const diaryModel = {
         SELECT 
           dates.dateColumn AS "date",
           d.idx AS "idx",
-          d.color AS "color",
-          d.createdAt AS "createdAt"
+          d.color AS "color"
         FROM dates
         LEFT JOIN LATERAL (
           SELECT * FROM diary AS d
