@@ -8,7 +8,6 @@ const accountModel = {
       values: [profileImg, nickname, "user", oauthGoogleId],
     };
   },
-  select: () => {},
   selectFromGoogleId: ({ oauthGoogleId }) => {
     return {
       sql: `

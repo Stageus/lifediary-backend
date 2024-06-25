@@ -1,11 +1,12 @@
 import axios from "axios";
 import accountModel from "../../../shared/models/accountModel.js";
+import subscriptionModel from "../../../shared/models/subscriptionModel.js";
 import jwt from "../../../shared/utils/jwt.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
 import sendError from "../../../shared/utils/sendError.js";
 
 const accountService = {
-  getRedirectUrl: (req, res) => {
+  oauthGoogle: (req, res) => {
     let url = "https://accounts.google.com/o/oauth2/v2/auth";
     url += `?client_id=${process.env.GOOGLE_ID}`;
     url += `&redirect_uri=${process.env.GOOGLE_REDIRECT_URI}`;
@@ -15,7 +16,7 @@ const accountService = {
     return { redirectUrl: url };
   },
 
-  selectOauthGoogleId: async (req, res) => {
+  oauthGoogleRedirect: async (req, res) => {
     const { code } = req.query;
 
     const googleToken = await axios.post(process.env.GOOGLE_TOKEN_URL, {
@@ -41,7 +42,7 @@ const accountService = {
     if (account) {
       const token = jwt.sign({
         profileImg: account.profileImg,
-        idx: account.idx,
+        accountIdx: account.idx,
         permission: account.permission,
       });
 
@@ -57,18 +58,19 @@ const accountService = {
     return result;
   },
 
-  selectIdx: async (req, res) => {
+  get: async (req, res) => {
     const { idx: accountIdx } = jwt.verify(req.headers.token);
     if (!accountIdx) {
       sendError({ status: 401, message: CONSTANTS.MSG[401] });
     }
 
     const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ accountIdx: accountIdx }));
-    const account = selectedRows.rows[0];
+    const result = selectedRows.rows[0];
 
-    return account;
+    return result;
   },
-  insertAccount: async (req, res) => {
+
+  post: async (req, res) => {
     const { profileImg, nickname, oauthGoogleId } = req.body;
 
     const insertedRows = await psqlConnect.query(
@@ -78,14 +80,15 @@ const accountService = {
 
     const token = jwt.sign({
       profileImg: account.profileImg,
-      idx: account.idx,
+      accountIdx: account.idx,
       permission: account.permission,
     });
 
     return { token: token };
   },
-  updateNickname: async (req, res) => {
-    const { idx: accountIdx } = jwt.verify(req.headers.token);
+
+  putNickname: async (req, res) => {
+    const { accountIdx } = jwt.verify(req.headers.token);
     if (!accountIdx) {
       sendError({ status: 401, message: CONSTANTS.MSG[401] });
     }
@@ -102,21 +105,26 @@ const accountService = {
 
     return;
   },
-  selectNickname: async (req, res) => {
-    const { idx: accountIdx } = jwt.verify(req.headers.token);
+
+  getNicknameDuplication: async (req, res) => {
+    const { accountIdx } = jwt.verify(req.headers.token);
     const { nickname } = req.body;
 
     const selectedRows = await psqlConnect.query(accountModel.selectNickname({ nickname: nickname }));
     const nicknameAccount = selectedRows.rows[0];
 
+    const result = { duplication: false };
     if (nicknameAccount && nicknameAccount.idx !== accountIdx) {
-      sendError({ status: 409, message: CONSTANTS.MSG[409] });
+      result.duplication = true;
     }
 
-    return;
+    return result;
   },
-  updateProfileImg: async (req, res) => {
-    const { idx: accountIdx } = jwt.verify(req.headers.token);
+
+  putProfileImg: async (req, res) => {
+    const { accountIdx } = jwt.verify(req.headers.token);
+    const { profileImg } = req.body;
+
     if (!accountIdx) {
       sendError({ status: 401, message: CONSTANTS.MSG[401] });
     }
@@ -125,9 +133,9 @@ const accountService = {
 
     return;
   },
-  selectAccount: () => {},
+
   delete: async (req, res) => {
-    const { idx: accountIdx } = jwt.verify(req.headers.token);
+    const { accountIdx } = jwt.verify(req.headers.token);
     if (!accountIdx) {
       sendError({ status: 401, message: CONSTANTS.MSG[401] });
     }
@@ -135,6 +143,30 @@ const accountService = {
     await psqlConnect.query(accountModel.delete({ accountIdx: accountIdx }));
 
     return;
+  },
+
+  getOtherAccount: async (req, res) => {
+    const { accountidx: otherAccountIdx } = req.params;
+    const selectedRowsFromAccount = await psqlConnect.query(
+      accountModel.selectFromIdx({ accountIdx: otherAccountIdx })
+    );
+    let result = selectedRowsFromAccount.rows[0];
+    result.isSubscribed = false;
+
+    if (jwt.verify(req.headers.token)) {
+      const { accountIdx } = jwt.verify(req.headers.token);
+      const selectedRowsFromSubscription = await psqlConnect.query(
+        subscriptionModel.select({ fromAccountIdx: accountIdx, toAccountIdx: otherAccountIdx })
+      );
+      if (selectedRowsFromSubscription.rows[0]) {
+        const isDeleted = selectedRowsFromSubscription.rows[0].isDeleted;
+        if (isDeleted === false) {
+          result.isSubscribed = true;
+        }
+      }
+    }
+
+    return result;
   },
 };
 
