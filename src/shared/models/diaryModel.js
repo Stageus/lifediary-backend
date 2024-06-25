@@ -23,7 +23,7 @@ const diaryModel = {
               year
                 ? `
                 DATE '${year - 1}-01-01',
-                DATE '${year}-01-01', 
+                DATE '${year - 1}-12-31', 
               `
                 : `
                 CURRENT_DATE - INTERVAL '1 year', 
