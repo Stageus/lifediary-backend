@@ -17,7 +17,7 @@ import exceptionHandler from "./src/shared/middlewares/exceptionHandler.js";
 
 const server = express();
 
-server.use(logger);
+// server.use(logger);
 
 server.use(express.json());
 server.use("/account", accountRoute);
@@ -35,4 +35,4 @@ server.listen(8000, () => {
   console.log(`8000번 포트로 실행 중`);
 });
 
-process.on("uncaughtException", terminationLogger);
+// process.on("uncaughtException", terminationLogger);
