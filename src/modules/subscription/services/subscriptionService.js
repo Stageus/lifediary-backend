@@ -1,5 +1,6 @@
 import jwt from "../../../shared/utils/jwt.js";
 import subscriptionModel from "../../../shared/models/subscriptionModel.js";
+import accountModel from "../../../shared/models/accountModel.js";
 import CONSTANTS from "../../../shared/utils/constansts.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
 import sendError from "../../../shared/utils/sendError.js";
@@ -30,11 +31,12 @@ const subscriptionService = {
       sendError({ status: 409, message: CONSTANTS.MSG[409] });
     }
 
-    try {
-      await psqlConnect.query(subscriptionModel.insert({ fromAccountIdx: accountIdx, toAccountIdx: toAccountIdx }));
-    } catch (err) {
+    const check = await psqlConnect.query(accountModel.selectFromIdx({ accountIdx: toAccountIdx }));
+    if (check.rowCount === 0) {
       sendError({ status: 404, message: CONSTANTS.MSG[404] });
     }
+
+    await psqlConnect.query(subscriptionModel.insert({ fromAccountIdx: accountIdx, toAccountIdx: toAccountIdx }));
 
     return;
   },
