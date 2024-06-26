@@ -32,6 +32,19 @@ const subscriptionModel = {
       ],
     };
   },
+
+  insert: ({ fromAccountIdx, toAccountIdx }) => {
+    return {
+      sql: `
+            INSERT INTO subscription (fromaccountidx, toaccountidx)
+            VALUES ($1, $2)
+            ON CONFLICT (fromaccountidx, toaccountidx)
+            DO UPDATE SET isdeleted = NOT subscription.isdeleted
+            RETURNING idx;
+            `,
+      values: [fromAccountIdx, toAccountIdx],
+    };
+  },
 };
 
 export default subscriptionModel;

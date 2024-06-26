@@ -9,6 +9,15 @@ const subscriptionController = {
       next(err);
     }
   },
+
+  post: async (req, res, next) => {
+    try {
+      await subscriptionService.post(req, res);
+      res.sendStatus(200);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 export default subscriptionController;

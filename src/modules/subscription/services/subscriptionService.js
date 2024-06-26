@@ -21,6 +21,23 @@ const subscriptionService = {
 
     return result;
   },
+
+  post: async (req, res) => {
+    const { toaccountidx: toAccountIdx } = req.params;
+    const { accountIdx } = jwt.verify(req.headers.token);
+
+    if (toAccountIdx == accountIdx) {
+      sendError({ status: 409, message: CONSTANTS.MSG[409] });
+    }
+
+    try {
+      await psqlConnect.query(subscriptionModel.insert({ fromAccountIdx: accountIdx, toAccountIdx: toAccountIdx }));
+    } catch (err) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+
+    return;
+  },
 };
 
 export default subscriptionService;

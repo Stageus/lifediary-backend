@@ -6,6 +6,13 @@ const subscriptionSchema = {
       notEmpty: true,
     },
   },
+  post: {
+    toaccountidx: {
+      in: ["param"],
+      notEmpty: true,
+      isInt: true,
+    },
+  },
 };
 
 export default subscriptionSchema;
