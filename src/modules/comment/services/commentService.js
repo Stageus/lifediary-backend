@@ -24,7 +24,7 @@ const commentService = {
     const { textContent } = req.body;
     const { accountIdx } = jwt.verify(req.headers.token);
 
-    const check = await psqlConnect.query(diaryModel.select({ diaryIdx: diaryIdx }));
+    const check = await psqlConnect.query(diaryModel.selectAccountIdx({ diaryIdx: diaryIdx }));
 
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
@@ -43,9 +43,9 @@ const commentService = {
         })
       );
 
-    const result = await psqlConnect.transaction(queries);
+    await psqlConnect.transaction(queries);
 
-    return result.rows;
+    return;
   },
   insertReply: async (req, res) => {
     const { parentCommentIdx } = req.params;
@@ -57,11 +57,11 @@ const commentService = {
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
-    const result = await psqlConnect.query(
+    await psqlConnect.query(
       commentModel.insertReply({ accountIdx: accountIdx, textContent: textContent, parentCommentIdx: parentCommentIdx })
     );
 
-    return result.rows;
+    return;
   },
   update: async (req, res) => {
     const { commentIdx } = req.params;
@@ -73,11 +73,11 @@ const commentService = {
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
-    const result = await psqlConnect.query(
+    await psqlConnect.query(
       commentModel.update({ commentIdx: commentIdx, accountIdx: accountIdx, textContent: textContent })
     );
 
-    return result.rows;
+    return;
   },
   delete: async (req, res) => {
     const { commentIdx } = req.params;
@@ -88,12 +88,12 @@ const commentService = {
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
-    const result = await psqlConnect.transaction([
+    await psqlConnect.transaction([
       commentModel.delete({ commentIdx: commentIdx, accountIdx: accountIdx }),
       diaryModel.updateCommentCnt({ commentIdx: commentIdx, isPlus: false }),
     ]);
 
-    return result.rows;
+    return;
   },
 };
 

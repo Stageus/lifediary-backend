@@ -33,9 +33,9 @@ const noticeService = {
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].toAccountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
-    const result = await psqlConnect.query(noticeModel.delete({ noticeIdx: noticeIdx, toAccountIdx: accountIdx }));
+    await psqlConnect.query(noticeModel.delete({ noticeIdx: noticeIdx, toAccountIdx: accountIdx }));
 
-    return result.rows;
+    return;
   },
 };
 
