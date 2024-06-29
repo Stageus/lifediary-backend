@@ -1,5 +1,4 @@
 const accountSchema = {
-
   post: {
     oauthGoogleId: {
       in: ["body"],
@@ -23,7 +22,7 @@ const accountSchema = {
       isLength: { options: { max: 20 } },
     },
   },
-  
+
   getNicknameDuplication: {
     nickname: {
       in: ["body"],
@@ -39,13 +38,12 @@ const accountSchema = {
     },
   },
   getOtherAccount: {
-    accountIdx: {
+    accountidx: {
       in: ["param"],
       notEmpty: true,
       isInt: true,
     },
   },
-
 };
 
 export default accountSchema;

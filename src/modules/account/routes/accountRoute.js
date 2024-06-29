@@ -10,16 +10,16 @@ accountRoute
 
   .get("/login/oauth/google", accountController.oauthGoogle)
   .get("/login/oauth/google/redirect", accountController.oauthGoogleRedirect)
-  .get("/", auth, accountController.get)
   .get("/:accountidx", validator(accountSchema.getOtherAccount), accountController.getOtherAccount)
+  .get("/", auth, accountController.get)
   .post("/", validator(accountSchema.post), accountController.post)
-  .put("/nickname", validator(accountSchema.putNickname), accountController.putNickname)
+  .put("/nickname", auth, validator(accountSchema.putNickname), accountController.putNickname)
   .get(
     "/nickname/duplication",
     validator(accountSchema.getNicknameDuplication),
     accountController.getNicknameDuplication
   )
-  .put("/profileimg", validator(accountSchema.putProfileImg), accountController.putProfileImg)
-  .delete("/", accountController.delete);
+  .put("/profileimg", auth, validator(accountSchema.putProfileImg), accountController.putProfileImg)
+  .delete("/", auth, accountController.delete);
 
 export default accountRoute;
