@@ -36,12 +36,16 @@ const subscriptionModel = {
   insert: ({ fromAccountIdx, toAccountIdx }) => {
     return {
       sql: `
-            INSERT INTO subscription (fromaccountidx, toaccountidx)
-            VALUES ($1, $2)
-            ON CONFLICT (fromaccountidx, toaccountidx)
-            DO UPDATE SET isdeleted = NOT subscription.isdeleted
-            RETURNING idx;
-            `,
+        WITH updateSubscription AS (
+          UPDATE subscription
+          SET isDeleted = NOT isDeleted
+          WHERE fromAccountIdx = $1 AND toAccountIdx = $2
+          RETURNING 1
+        )
+        INSERT INTO subscription (fromAccountIdx, toAccountIdx)
+        SELECT $1, $2
+        WHERE NOT EXISTS (SELECT 1 FROM updateSubscription)
+      `,
       values: [fromAccountIdx, toAccountIdx],
     };
   },
