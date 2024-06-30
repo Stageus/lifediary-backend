@@ -1,5 +1,5 @@
 const noticeSchema = {
-  selectNotices: {
+  get: {
     page: {
       in: ["query"],
       isInt: true,

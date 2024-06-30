@@ -5,7 +5,7 @@ import psqlConnect from "../../../shared/utils/psqlConnect.js";
 import sendError from "../../../shared/utils/sendError.js";
 
 const noticeService = {
-  selectNotices: async (req, res) => {
+  get: async (req, res) => {
     const { page } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
 
@@ -17,7 +17,7 @@ const noticeService = {
 
     return result.rows;
   },
-  selectIsNew: async (req, res) => {
+  getIsNew: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
 
     const result = await psqlConnect.query(noticeModel.selectIsNew({ toAccountIdx: accountIdx }));
