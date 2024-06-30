@@ -18,9 +18,7 @@ import interceptor from "./src/shared/middlewares/interceptor.js";
 const server = express();
 server.use(express.json());
 
-
 server.use(interceptor);
-
 
 server.use("/account", accountRoute);
 server.use("/auth", authRoute);
@@ -36,6 +34,5 @@ server.use(errorHandler);
 server.listen(8000, () => {
   console.log(`8000번 포트로 실행 중`);
 });
-
 
 process.on("uncaughtException", uncaughtExceptionLogger);
