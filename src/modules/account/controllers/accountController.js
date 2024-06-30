@@ -28,7 +28,7 @@ const accountController = {
     }
   },
 
-  post: async (req, res) => {
+  post: async (req, res, next) => {
     try {
       const result = await accountService.post(req, res);
       res.status(200).send(result);
