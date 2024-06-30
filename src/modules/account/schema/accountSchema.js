@@ -38,7 +38,7 @@ const accountSchema = {
     },
   },
   getOtherAccount: {
-    accountidx: {
+    accountIdx: {
       in: ["param"],
       notEmpty: true,
       isInt: true,
