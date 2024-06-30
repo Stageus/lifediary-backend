@@ -6,8 +6,8 @@ import noticeSchema from "../schema/noticeSchema.js";
 const noticeRoute = express.Router();
 
 noticeRoute
-  .get("/", validator(noticeSchema.selectNotices), noticeController.selectNotices)
-  .get("/new", noticeController.selectIsNew)
+  .get("/", validator(noticeSchema.get), noticeController.get)
+  .get("/new", noticeController.getIsNew)
   .delete("/:noticeIdx", validator(noticeSchema.delete), noticeController.delete);
 
 export default noticeRoute;

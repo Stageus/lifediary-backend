@@ -1,17 +1,17 @@
 import noticeService from "../services/noticeService.js";
 
 const noticeController = {
-  selectNotices: async (req, res, next) => {
+  get: async (req, res, next) => {
     try {
-      const result = await noticeService.selectNotices(req, res);
+      const result = await noticeService.get(req, res);
       res.status(200).send(result);
     } catch (err) {
       return next(err);
     }
   },
-  selectIsNew: async (req, res, next) => {
+  getIsNew: async (req, res, next) => {
     try {
-      const result = await noticeService.selectIsNew(req, res);
+      const result = await noticeService.getIsNew(req, res);
       res.status(200).send(result);
     } catch (err) {
       return next(err);
