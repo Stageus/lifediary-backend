@@ -7,7 +7,7 @@ const subscriptionSchema = {
     },
   },
   post: {
-    toaccountidx: {
+    toAccountIdx: {
       in: ["param"],
       notEmpty: true,
       isInt: true,

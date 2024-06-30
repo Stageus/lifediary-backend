@@ -24,7 +24,7 @@ const subscriptionService = {
   },
 
   post: async (req, res) => {
-    const { toaccountidx: toAccountIdx } = req.params;
+    const { toAccountIdx } = req.params;
     const { accountIdx } = jwt.verify(req.headers.token);
 
     if (toAccountIdx == accountIdx) {
