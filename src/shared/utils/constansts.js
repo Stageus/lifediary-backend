@@ -5,7 +5,6 @@ const CONSTANTS = Object.freeze({
     404: "no resouce",
     401: "auth failure",
     403: "wrong access",
-    401: "token error",
     400: "unvalid value",
   }),
   RULE: Object.freeze({
@@ -15,6 +14,7 @@ const CONSTANTS = Object.freeze({
     DIARY_HOME_PAGE_LIMIT: 15,
     NOTICE_PAGE_LIMIT: 10,
     SUBSCRIPTION_PAGE_LIMIT: 20,
+    VALID_FILE_TYPE: Object.freeze(["png", "gif", "jpg", "jpeg"]),
   }),
   NOTICE_TYPE: Object.freeze({
     NEW_COMMENT: "newComment",
