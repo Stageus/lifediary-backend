@@ -20,7 +20,7 @@ const diaryService = {
       })
     );
 
-    if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
     return result.rows;
   },
@@ -32,7 +32,7 @@ const diaryService = {
       diaryModel.selectMain({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip })
     );
 
-    if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
     return result.rows;
   },
@@ -40,9 +40,11 @@ const diaryService = {
     const { page, tags } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
 
-    // selectSearch
+    const result = await psqlConnect.query(
+      diaryModel.selectSearch({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip, tags: JSON.parse(tags) })
+    );
 
-    // 404
+    if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
     return result.rows;
   },
