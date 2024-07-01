@@ -6,7 +6,6 @@ import CONSTANTS from "../utils/constansts.js";
 const bucketModel = {
   insertMany: async ({ imgContents, bucketFolderPath }) => {
     try {
-      console.log("hah");
       await Promise.all(
         imgContents.map((img) => {
           return new Promise((resolve, reject) => {
@@ -25,7 +24,6 @@ const bucketModel = {
         })
       );
 
-      console.log(2);
       return;
     } catch (err) {
       sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
@@ -35,7 +33,6 @@ const bucketModel = {
   },
   deleteMany: async ({ deletedBucketImgs }) => {
     try {
-      console.log(1);
       await new Promise((resolve, reject) => {
         s3.deleteObjects(
           {
@@ -53,7 +50,6 @@ const bucketModel = {
         );
       });
 
-      console.log(2);
       return;
     } catch (err) {
       sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });

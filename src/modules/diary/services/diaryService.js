@@ -70,7 +70,7 @@ const diaryService = {
   },
   post: async (req, res) => {
     const { textContent, color, isPublic } = req.body;
-    const tags = typeof req.body.tags === "string" ? JSON.parse(req.body.tags) : req.body.tags;
+    const tags = typeof req.body.tags === "string" ? JSON.parse(req.body.tags) : req.body.tags || [];
     const imgContents = fileFormat(req.files);
     const { accountIdx } = jwt.verify(req.headers.token);
 
@@ -145,7 +145,7 @@ const diaryService = {
     const deletedImgInfo = deletedImgs.map((url) => {
       const pathname = new URL(url).pathname;
       return {
-        filePath: pathname,
+        filePath: pathname.substring(1),
         fileName: pathname.substring(pathname.lastIndexOf("/") + 1),
       };
     });
@@ -190,6 +190,7 @@ const diaryService = {
           })
         );
       }
+
       if (deletedImgInfo.length > 0) {
         bucketOperations.push(bucketModel.deleteMany({ deletedBucketImgs: deletedImgInfo.map((img) => img.filePath) }));
       }
