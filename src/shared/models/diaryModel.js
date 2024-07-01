@@ -1,3 +1,6 @@
+import CONSTANTS from "../utils/constansts.js";
+import seedCTE from "../utils/seedCTE.js";
+
 const diaryModel = {
   insert: () => {},
   selectAccountIdx: ({ diaryIdx }) => {
@@ -9,11 +12,149 @@ const diaryModel = {
       values: [diaryIdx],
     };
   },
-  selectMainPage: () => {},
-  selectHomePage: () => {},
-  selectSearchPage: () => {},
-  selectLikeTab: () => {},
-  selectMineTab: () => {},
+  selectMainWithFirstRow: ({ accountIdx, ipAddress, diaryIdx, page }) => {
+    return {
+      sql: `
+            ${seedCTE({
+              identifier: accountIdx ? "accountIdx" : "ipAddress",
+              identifierValue: accountIdx || ipAddress,
+              isFirstPage: page === 1,
+            })},
+            firstRecord AS (
+              SELECT diary.idx, 
+                diary.imgContents AS "imgContents", 
+                diary.textContent AS "textContent",
+                diary.likeCnt AS "likeCnt",
+                diary.commentCnt AS "commentCnt",
+                diary.createdAt AS "createdAt",
+                account.nickname,
+                account.profileImg AS "profileImg",
+                ${
+                  accountIdx
+                    ? `
+                  CASE 
+                    WHEN EXISTS (
+                      SELECT 1 FROM "subscription"
+                      WHERE fromAccountIdx = '${accountIdx}' AND toAccountIdx = diary.accountIdx
+                    ) THEN true
+                    ELSE false
+                  END AS isSubscribed,
+                  CASE 
+                    WHEN EXISTS (
+                      SELECT 1 FROM "like" 
+                      WHERE accountIdx = '${accountIdx}' AND "like".diaryIdx = diary.idx AND isDeleted = false
+                    ) THEN true
+                    ELSE false
+                  END AS "isLiked"
+                `
+                    : `
+                  false AS isSubscribed,
+                  false AS "isLiked"
+                `
+                }
+              FROM diary
+              JOIN account ON account.idx = diary.accountIdx
+              WHERE diary.idx = $1
+              LIMIT 1
+            ),
+            randomRecords AS (
+              SELECT diary.idx, 
+                diary.imgContents AS "imgContents", 
+                diary.textContent AS "textContent",
+                diary.likeCnt AS "likeCnt",
+                diary.commentCnt AS "commentCnt",
+                diary.createdAt AS "createdAt",
+                account.nickname,
+                account.profileImg AS "profileImg",
+                ${
+                  accountIdx
+                    ? `
+                  CASE 
+                    WHEN EXISTS (
+                      SELECT 1 FROM "subscription"
+                      WHERE fromAccountIdx = '${accountIdx}' AND toAccountIdx = diary.accountIdx
+                    ) THEN true
+                    ELSE false
+                  END AS isSubscribed,
+                  CASE 
+                    WHEN EXISTS (
+                      SELECT 1 FROM "like" 
+                      WHERE accountIdx = '${accountIdx}' AND "like".diaryIdx = diary.idx AND isDeleted = false
+                    ) THEN true
+                    ELSE false
+                  END AS "isLiked"
+                `
+                    : `
+                  false AS isSubscribed,
+                  false AS "isLiked"
+                `
+                }
+              FROM diary
+              JOIN account ON account.idx = diary.accountIdx
+              WHERE diary.idx != $1
+              ORDER BY md5(diary.idx::text || (SELECT seed FROM seedRecord))
+            ),
+            combined AS (
+              SELECT * FROM firstRecord
+              UNION ALL
+              SELECT * FROM randomRecords
+            )
+            SELECT * FROM combined
+            LIMIT $2 OFFSET $3
+          `,
+      values: [diaryIdx, CONSTANTS.RULE.DIARY_PAGE_LIMIT, CONSTANTS.RULE.DIARY_PAGE_LIMIT * (page - 1)],
+    };
+  },
+  selectMain: ({ accountIdx, ipAddress, page }) => {
+    return {
+      sql: `
+        ${seedCTE({
+          identifier: accountIdx ? "accountIdx" : "ipAddress",
+          identifierValue: accountIdx || ipAddress,
+          isFirstPage: page === 1,
+        })}
+        SELECT
+          diary.idx,
+          diary.imgContents AS "imgContents",
+          diary.textContent AS "textContent",
+          diary.likeCnt AS "likeCnt",
+          diary.commentCnt AS "commentCnt",
+          diary.createdAt AS "createdAt",
+          account.nickname,
+          account.profileImg AS "profileImg",
+          ${
+            accountIdx
+              ? `
+            CASE
+              WHEN EXISTS (
+                SELECT 1 FROM "subscription"
+                WHERE fromAccountIdx = ${accountIdx} AND toAccountIdx = diary.accountIdx
+              ) THEN true
+              ELSE false
+            END AS "isSubscribed",
+            CASE
+              WHEN EXISTS (
+                SELECT 1 FROM "like"
+                WHERE accountIdx = ${accountIdx} AND "like".diaryIdx = diary.idx AND isDeleted = false
+              ) THEN true
+              ELSE false
+            END AS "isLiked"
+          `
+              : `
+            false AS "isSubscribed",
+            false AS "isLiked"
+          `
+          }
+        FROM diary
+        JOIN account ON account.idx = diary.accountIdx
+        ORDER BY md5(diary.idx::text || (SELECT seed FROM seedRecord))
+        LIMIT $1 OFFSET $2
+        `,
+      values: [CONSTANTS.RULE.DIARY_PAGE_LIMIT, CONSTANTS.RULE.DIARY_PAGE_LIMIT * (page - 1)],
+    };
+  },
+  selectHome: () => {},
+  selectSearch: () => {},
   selectGrass: ({ accountIdx, year }) => {
     return {
       sql: `

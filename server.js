@@ -23,7 +23,7 @@ server.use(interceptor);
 server.use("/account", accountRoute);
 server.use("/auth", authRoute);
 server.use("/comment", commentRoute);
-// server.use("/diary", diaryRoute);
+server.use("/diary", diaryRoute);
 server.use("/grass", grassRoute);
 server.use("/notice", noticeRoute);
 // server.use("/report", reportRoute);

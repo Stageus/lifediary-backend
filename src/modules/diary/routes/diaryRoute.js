@@ -1,18 +1,19 @@
 import express from "express";
+import diaryController from "../controllers/diaryController.js";
 
 const diaryRoute = express.Router();
 
-diaryRoute;
-// .get("/diary", diaryController)
-// .get("/diary/search", diaryController)
-// .get("/diary/home", diaryController)
-// .get("/diary/:diaryIdx", diaryController)
-// .get("/diary/mypage/mine", diaryController)
-// .get("/diary/mypage/like", diaryController)
-// .get("/diary/userpage/:accountIdx/mine", diaryController)
-// .post("/diary", diaryController)
-// .put("/diary/:diaryIdx", diaryController)
-// .delete("/diary/:diaryIdx", diaryController)
-// .post("/diary/:diaryIdx/like", diaryController);
+diaryRoute //
+  .get("/", diaryController.getMain)
+  .get("/:diaryIdx", diaryController.getMainWithFirstData);
+// .get("/search", diaryController)
+// .get("/home", diaryController)
+// .get("/mypage/mine", diaryController)
+// .get("/mypage/like", diaryController)
+// .get("/userpage/:accountIdx/mine", diaryController)
+// .post("/", diaryController)
+// .put("/:diaryIdx", diaryController)
+// .delete("/:diaryIdx", diaryController)
+// .post("/:diaryIdx/like", diaryController);
 
 export default diaryRoute;
