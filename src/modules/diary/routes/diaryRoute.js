@@ -1,5 +1,6 @@
 import express from "express";
 import diaryController from "../controllers/diaryController.js";
+import upload from "../../../shared/middlewares/upload.js";
 
 const diaryRoute = express.Router();
 
@@ -7,8 +8,8 @@ diaryRoute //
   .get("/home", diaryController.getHome)
   .get("/search", diaryController.getSearch)
   .get("/:diaryIdx", diaryController.getMainWithFirstData)
-  .get("/", diaryController.getMain);
-// .post("/", diaryController)
+  .get("/", diaryController.getMain)
+  .post("/", upload.array("imgContents"), diaryController.post);
 // .put("/:diaryIdx", diaryController)
 // .delete("/:diaryIdx", diaryController)
 

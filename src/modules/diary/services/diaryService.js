@@ -1,9 +1,16 @@
+import bucketModel from "../../../shared/models/bucketModel.js";
 import diaryModel from "../../../shared/models/diaryModel.js";
 import CONSTANTS from "../../../shared/utils/constansts.js";
 import jwt from "../../../shared/utils/jwt.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
-import seedCTE from "../../../shared/utils/seedCTE.js";
 import sendError from "../../../shared/utils/sendError.js";
+import path from "path";
+import pg from "pg";
+import psqlConfig from "../../../shared/configs/psqlConfig.js";
+import noticeModel from "../../../shared/models/noticeModel.js";
+import tagModel from "../../../shared/models/tagModel.js";
+import fileFormat from "../../../shared/utils/fileFormat.js";
+import accountModel from "../../../shared/models/accountModel.js";
 
 const diaryService = {
   getMainWithFirstData: async (req, res) => {
@@ -37,7 +44,8 @@ const diaryService = {
     return result.rows;
   },
   getSearch: async (req, res) => {
-    const { page, tags } = req.query;
+    const { page } = req.query;
+    const tags = typeof req.query.tags === "string" ? JSON.stringify(req.query.tags) : req.query.tags;
     const { accountIdx } = jwt.verify(req.headers.token);
 
     const result = await psqlConnect.query(
@@ -61,15 +69,72 @@ const diaryService = {
     return result.rows;
   },
   post: async (req, res) => {
-    const { imgContents, textContents, tags, isPublic, color } = req.body;
+    const { textContent, color } = req.body;
+    const tags = typeof req.body.tags === "string" ? JSON.parse(req.body.tags) : req.body.tags;
+    const isPublic = typeof req.body.isPublic === "string" ? JSON.parse(req.body.isPublic) : req.body.isPublic;
+    const imgContents = fileFormat(req.files);
     const { accountIdx } = jwt.verify(req.headers.token);
 
-    // insert
-    // noticeInsert
-    // tagInsert
-    // accountDiaryCnt update
+    let poolClient;
+    try {
+      poolClient = await new pg.Pool(psqlConfig).connect();
+      await poolClient.query("BEGIN");
 
-    return result.rows;
+      // first
+      const firstQuery = diaryModel.insert({
+        textContent,
+        imgContents: imgContents.map((img) => img.fileName),
+        tags,
+        color,
+        isPublic,
+        accountIdx,
+      });
+      const {
+        rows: [{ idx: diaryIdx }],
+      } = await poolClient.query(firstQuery.sql, firstQuery.values);
+
+      // second
+      await Promise.all([
+        // s3
+        bucketModel.insertMany({
+          imgContents: imgContents,
+          bucketFolderPath: path.join(accountIdx.toString(), diaryIdx.toString()),
+        }),
+
+        // psql
+        Promise.all([
+          poolClient.query(
+            noticeModel.insert({
+              fromAccountIdx: accountIdx,
+              diaryIdx: diaryIdx,
+              noticeType: CONSTANTS.NOTICE_TYPE.NEW_DIARY,
+            }).sql,
+            noticeModel.insert({
+              fromAccountIdx: accountIdx,
+              diaryIdx: diaryIdx,
+              noticeType: CONSTANTS.NOTICE_TYPE.NEW_DIARY,
+            }).values
+          ),
+          poolClient.query(
+            tagModel.insert({ diaryIdx: diaryIdx, tags: tags }).sql,
+            tagModel.insert({ diaryIdx: diaryIdx, tags: tags }).values
+          ),
+          poolClient.query(
+            accountModel.updateDiaryCnt({ accountIdx: accountIdx, isPlus: true }).sql,
+            accountModel.updateDiaryCnt({ accountIdx: accountIdx, isPlus: true }).values
+          ),
+        ]),
+      ]);
+
+      await poolClient.query("COMMIT");
+    } catch (err) {
+      await poolClient.query("ROLLBACK");
+      sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
+    } finally {
+      if (poolClient) poolClient.release();
+    }
+
+    return;
   },
   put: async (req, res) => {
     const { imgContents, deletedImgs, textContents, tags, isPublic, color } = req.body;
