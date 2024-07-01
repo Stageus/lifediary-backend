@@ -31,7 +31,7 @@ const accountModel = {
       values: [accountIdx],
     };
   },
-  
+
   delete: ({ accountIdx }) => {
     return {
       sql: `
@@ -53,7 +53,7 @@ const accountModel = {
       values: [nickname],
     };
   },
-  
+
   updateNickname: ({ nickname, accountIdx }) => {
     return {
       sql: `
@@ -78,6 +78,19 @@ const accountModel = {
     };
   },
 
+  updateDiaryCnt: ({ accountIdx, isPlus }) => {
+    return {
+      sql: `
+          UPDATE account
+          SET diaryCnt = CASE
+            WHEN $1 THEN diaryCnt + 1
+            ELSE diaryCnt - 1
+          END
+          WHERE idx = $2;
+        `,
+      values: [isPlus, accountIdx],
+    };
+  },
 };
 
 export default accountModel;
