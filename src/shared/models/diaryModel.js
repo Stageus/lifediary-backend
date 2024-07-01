@@ -1,6 +1,35 @@
 import CONSTANTS from "../utils/constansts.js";
 import seedCTE from "../utils/seedCTE.js";
 
+const mainColumnSelect = (accountIdx) => `
+      diary.idx,
+      ARRAY(SELECT 
+      'https://${
+        process.env.AWS_BUCKETNAME
+      }.s3.ap-northeast-2.amazonaws.com/' || account.idx || '/' || diary.idx || '/' || tmp
+      FROM unnest(diary.imgContents) AS tmp) AS "imgContents",
+      diary.textContent AS "textContent",
+      diary.likeCnt AS "likeCnt",
+      diary.commentCnt AS "commentCnt",
+      diary.createdAt AS "createdAt",
+      account.nickname,
+      account.profileImg AS "profileImg",
+      ${
+        accountIdx
+          ? `CASE WHEN EXISTS (
+              SELECT 1 FROM "subscription"
+              WHERE fromAccountIdx = '${accountIdx}' AND toAccountIdx = diary.accountIdx) THEN true
+            ELSE false
+          END AS isSubscribed,
+          CASE WHEN EXISTS (
+              SELECT 1 FROM "like" 
+              WHERE accountIdx = '${accountIdx}' AND "like".diaryIdx = diary.idx AND isDeleted = false) THEN true
+            ELSE false
+          END AS "isLiked"`
+          : `false AS isSubscribed, false AS "isLiked"`
+      }
+    `;
+
 const diaryModel = {
   insert: ({ textContent, imgContents, tags, accountIdx, color, isPublic }) => {
     return {
@@ -31,89 +60,19 @@ const diaryModel = {
             isFirstPage: page === 1,
           })},
           firstRecord AS (
-            SELECT diary.idx, 
-              ARRAY(
-                  SELECT concat(
-                  'https://${process.env.AWS_BUCKETNAME}.s3.ap-northeast-2.amazonaws.com/'
-                  ,account.idx, '/', diary.idx, '/', tmp
-                  )
-                  FROM unnest(diary.imgContents) AS tmp
-              ) AS "imgContents",
-              diary.textContent AS "textContent",
-              diary.likeCnt AS "likeCnt",
-              diary.commentCnt AS "commentCnt",
-              diary.createdAt AS "createdAt",
-              account.nickname,
-              account.profileImg AS "profileImg",
-              ${
-                accountIdx
-                  ? `
-                CASE 
-                  WHEN EXISTS (
-                    SELECT 1 FROM "subscription"
-                    WHERE fromAccountIdx = '${accountIdx}' AND toAccountIdx = diary.accountIdx
-                  ) THEN true
-                  ELSE false
-                END AS isSubscribed,
-                CASE 
-                  WHEN EXISTS (
-                    SELECT 1 FROM "like" 
-                    WHERE accountIdx = '${accountIdx}' AND "like".diaryIdx = diary.idx AND isDeleted = false
-                  ) THEN true
-                  ELSE false
-                END AS "isLiked"
-              `
-                  : `
-                false AS isSubscribed,
-                false AS "isLiked"
-              `
-              }
+            SELECT ${mainColumnSelect(accountIdx)}
             FROM diary
             JOIN account ON account.idx = diary.accountIdx
             WHERE diary.idx = $1
             LIMIT 1
           ),
           randomRecords AS (
-            SELECT diary.idx, 
-              ARRAY(
-                  SELECT concat(
-                  'https://${process.env.AWS_BUCKETNAME}.s3.ap-northeast-2.amazonaws.com/'
-                  ,account.idx, '/', diary.idx, '/', tmp
-                  )
-                  FROM unnest(diary.imgContents) AS tmp
-              ) AS "imgContents",
-              diary.textContent AS "textContent",
-              diary.likeCnt AS "likeCnt",
-              diary.commentCnt AS "commentCnt",
-              diary.createdAt AS "createdAt",
-              account.nickname,
-              account.profileImg AS "profileImg",
-              ${
-                accountIdx
-                  ? `
-                CASE 
-                  WHEN EXISTS (
-                    SELECT 1 FROM "subscription"
-                    WHERE fromAccountIdx = '${accountIdx}' AND toAccountIdx = diary.accountIdx
-                  ) THEN true
-                  ELSE false
-                END AS isSubscribed,
-                CASE 
-                  WHEN EXISTS (
-                    SELECT 1 FROM "like" 
-                    WHERE accountIdx = '${accountIdx}' AND "like".diaryIdx = diary.idx AND isDeleted = false
-                  ) THEN true
-                  ELSE false
-                END AS "isLiked"
-              `
-                  : `
-                false AS isSubscribed,
-                false AS "isLiked"
-              `
-              }
+            SELECT ${mainColumnSelect(accountIdx)}
             FROM diary
             JOIN account ON account.idx = diary.accountIdx
             WHERE diary.idx != $1
+              AND diary.isDeleted = false
+              AND (diary.isPublic = true OR ${accountIdx ? `diary.accountIdx = ${accountIdx}` : "false"})
             ORDER BY md5(diary.idx::text || (SELECT seed FROM seedRecord))
           ),
           combined AS (
@@ -135,46 +94,12 @@ const diaryModel = {
           identifierValue: accountIdx || ipAddress,
           isFirstPage: page === 1,
         })}
-        SELECT
-          diary.idx,
-          ARRAY(
-              SELECT concat(
-              'https://${process.env.AWS_BUCKETNAME}.s3.ap-northeast-2.amazonaws.com/'
-              ,account.idx, '/', diary.idx, '/', tmp
-              )
-              FROM unnest(diary.imgContents) AS tmp
-          ) AS "imgContents",
-          diary.textContent AS "textContent",
-          diary.likeCnt AS "likeCnt",
-          diary.commentCnt AS "commentCnt",
-          diary.createdAt AS "createdAt",
-          account.nickname,
-          account.profileImg AS "profileImg",
-          ${
-            accountIdx
-              ? `
-            CASE
-              WHEN EXISTS (
-                SELECT 1 FROM "subscription"
-                WHERE fromAccountIdx = ${accountIdx} AND toAccountIdx = diary.accountIdx
-              ) THEN true
-              ELSE false
-            END AS "isSubscribed",
-            CASE
-              WHEN EXISTS (
-                SELECT 1 FROM "like"
-                WHERE accountIdx = ${accountIdx} AND "like".diaryIdx = diary.idx AND isDeleted = false
-              ) THEN true
-              ELSE false
-            END AS "isLiked"
-          `
-              : `
-            false AS "isSubscribed",
-            false AS "isLiked"
-          `
-          }
+        SELECT ${mainColumnSelect(accountIdx)}
         FROM diary
         JOIN account ON account.idx = diary.accountIdx
+        WHERE 
+          diary.isDeleted = false
+          AND (diary.isPublic = true OR ${accountIdx ? `diary.accountIdx = ${accountIdx}` : "false"})
         ORDER BY md5(diary.idx::text || (SELECT seed FROM seedRecord))
         LIMIT $1 OFFSET $2
         `,
@@ -190,12 +115,17 @@ const diaryModel = {
           isFirstPage: page === 1,
         })}
         SELECT 
-          diary.idx,
-          diary.imgContents[1] AS "thumbnailImg",
+          diary.idx, 
+          'https://${
+            process.env.AWS_BUCKETNAME
+          }.s3.ap-northeast-2.amazonaws.com/' || account.idx || '/' || diary.idx || '/' || diary.imgContents[1] AS "thumbnailImg",
           account.nickname,
           account.profileImg AS "profileImg"
         FROM diary
         JOIN account ON diary.accountIdx = account.idx
+        WHERE 
+          diary.isDeleted = false
+          AND (diary.isPublic = true OR ${accountIdx ? `diary.accountIdx = ${accountIdx}` : "false"})
         ORDER BY md5(diary.idx::text || (SELECT seed FROM seedRecord)::text)
         LIMIT $1 OFFSET $2
       `,
@@ -217,7 +147,9 @@ const diaryModel = {
         )
         SELECT 
           diary.idx,
-          diary.imgContents[1] AS "thumbnailImg",
+          'https://${
+            process.env.AWS_BUCKETNAME
+          }.s3.ap-northeast-2.amazonaws.com/' || account.idx || '/' || diary.idx || '/' || diary.imgContents[1] AS "thumbnailImg",
           diary.textContent AS "textContent",
           diary.likeCnt AS "likeCnt",
           diary.createdAt AS "createdAt",
@@ -227,6 +159,9 @@ const diaryModel = {
         FROM diary
         JOIN account ON diary.accountIdx = account.idx
         JOIN tagDiaryIdx ON diary.idx = tagDiaryIdx.diaryIdx
+        WHERE 
+          diary.isDeleted = false
+          AND (diary.isPublic = true OR ${accountIdx ? `diary.accountIdx = ${accountIdx}` : "false"})
         ORDER BY md5(diary.idx::text || (SELECT seed FROM seedRecord)::text)
         LIMIT $2 OFFSET $3
       `,
@@ -234,21 +169,17 @@ const diaryModel = {
     };
   },
   selectGrass: ({ accountIdx, year }) => {
+    const period = year
+      ? `DATE '${year - 1}-01-01',
+        DATE '${year - 1}-12-31',`
+      : `CURRENT_DATE - INTERVAL '1 year', 
+        CURRENT_DATE,`;
+
     return {
       sql: `
         WITH dates AS (
           SELECT generate_series(
-            ${
-              year
-                ? `
-                DATE '${year - 1}-01-01',
-                DATE '${year - 1}-12-31', 
-              `
-                : `
-                CURRENT_DATE - INTERVAL '1 year', 
-                CURRENT_DATE,
-              `
-            }
+            ${period}
             INTERVAL '1 day'
           )::date AS dateColumn
         )

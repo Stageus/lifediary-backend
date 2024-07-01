@@ -45,11 +45,11 @@ const diaryService = {
   },
   getSearch: async (req, res) => {
     const { page } = req.query;
-    const tags = typeof req.query.tags === "string" ? JSON.stringify(req.query.tags) : req.query.tags;
+    const tags = typeof req.query.tags === "string" ? JSON.parse(req.query.tags) : req.query.tags;
     const { accountIdx } = jwt.verify(req.headers.token);
 
     const result = await psqlConnect.query(
-      diaryModel.selectSearch({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip, tags: JSON.parse(tags) })
+      diaryModel.selectSearch({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip, tags: tags })
     );
 
     if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
@@ -69,9 +69,8 @@ const diaryService = {
     return result.rows;
   },
   post: async (req, res) => {
-    const { textContent, color } = req.body;
+    const { textContent, color, isPublic } = req.body;
     const tags = typeof req.body.tags === "string" ? JSON.parse(req.body.tags) : req.body.tags;
-    const isPublic = typeof req.body.isPublic === "string" ? JSON.parse(req.body.isPublic) : req.body.isPublic;
     const imgContents = fileFormat(req.files);
     const { accountIdx } = jwt.verify(req.headers.token);
 
