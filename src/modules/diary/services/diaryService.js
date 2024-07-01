@@ -220,7 +220,10 @@ const diaryService = {
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
 
-    await psqlConnect.query(diaryModel.delete({ diaryIdx }));
+    await psqlConnect.transaction([
+      diaryModel.delete({ diaryIdx }),
+      accountModel.updateDiaryCnt({ accountIdx: accountIdx, isPlus: false }),
+    ]);
 
     return;
   },
