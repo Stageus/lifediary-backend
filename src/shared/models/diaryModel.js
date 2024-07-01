@@ -18,12 +18,12 @@ const mainColumnSelect = (accountIdx) => `
         accountIdx
           ? `CASE WHEN EXISTS (
               SELECT 1 FROM "subscription"
-              WHERE fromAccountIdx = '${accountIdx}' AND toAccountIdx = diary.accountIdx) THEN true
+              WHERE fromAccountIdx = '${accountIdx}' AND toAccountIdx = diary.accountIdx AND "subscription".isDeleted = false) THEN true
             ELSE false
           END AS isSubscribed,
           CASE WHEN EXISTS (
               SELECT 1 FROM "like" 
-              WHERE accountIdx = '${accountIdx}' AND "like".diaryIdx = diary.idx AND isDeleted = false) THEN true
+              WHERE accountIdx = '${accountIdx}' AND "like".diaryIdx = diary.idx AND "like".isDeleted = false) THEN true
             ELSE false
           END AS "isLiked"`
           : `false AS isSubscribed, false AS "isLiked"`
@@ -46,7 +46,7 @@ const diaryModel = {
     return {
       sql: `
           SELECT accountIdx AS "accountIdx" FROM diary
-          WHERE idx = $1
+          WHERE "diary".idx = $1 AND "diary".isDeleted = false;
         `,
       values: [diaryIdx],
     };
@@ -64,6 +64,8 @@ const diaryModel = {
             FROM diary
             JOIN account ON account.idx = diary.accountIdx
             WHERE diary.idx = $1
+              AND diary.isDeleted = false
+              AND (diary.isPublic = true OR ${accountIdx ? `diary.accountIdx = ${accountIdx}` : "false"})
             LIMIT 1
           ),
           randomRecords AS (
@@ -191,6 +193,7 @@ const diaryModel = {
         LEFT JOIN LATERAL (
           SELECT * FROM diary AS d
           WHERE d.createdAt::date = dates.dateColumn
+          AND d.isDeleted = false
           AND d.accountIdx = $1
           LIMIT 1
         ) d ON true
@@ -211,7 +214,7 @@ const diaryModel = {
             tags = $4,
             color = $5,
             isPublic = $6
-        WHERE idx = $7 AND accountIdx = $8;
+        WHERE idx = $7 AND accountIdx = $8 AND isDeleted = false;
       `,
       values: [deletedImgs, imgContents, textContent, tags, color, isPublic, diaryIdx, accountIdx],
     };
@@ -226,7 +229,6 @@ const diaryModel = {
             ELSE commentCnt - 1
           END
           WHERE idx = $2;
-  
         `,
         values: [isPlus, diaryIdx],
       };
@@ -245,7 +247,16 @@ const diaryModel = {
       };
     }
   },
-  delete: () => {},
+  delete: ({ diaryIdx }) => {
+    return {
+      sql: `
+        UPDATE diary
+        SET isDeleted = true
+        WHERE idx = $1;
+      `,
+      values: [diaryIdx],
+    };
+  },
 };
 
 export default diaryModel;
