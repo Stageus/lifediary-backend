@@ -32,7 +32,13 @@ const diaryModel = {
           })},
           firstRecord AS (
             SELECT diary.idx, 
-              diary.imgContents AS "imgContents", 
+              ARRAY(
+                  SELECT concat(
+                  'https://${process.env.AWS_BUCKETNAME}.s3.ap-northeast-2.amazonaws.com/'
+                  ,account.idx, '/', diary.idx, '/', tmp
+                  )
+                  FROM unnest(diary.imgContents) AS tmp
+              ) AS "imgContents",
               diary.textContent AS "textContent",
               diary.likeCnt AS "likeCnt",
               diary.commentCnt AS "commentCnt",
@@ -69,7 +75,13 @@ const diaryModel = {
           ),
           randomRecords AS (
             SELECT diary.idx, 
-              diary.imgContents AS "imgContents", 
+              ARRAY(
+                  SELECT concat(
+                  'https://${process.env.AWS_BUCKETNAME}.s3.ap-northeast-2.amazonaws.com/'
+                  ,account.idx, '/', diary.idx, '/', tmp
+                  )
+                  FROM unnest(diary.imgContents) AS tmp
+              ) AS "imgContents",
               diary.textContent AS "textContent",
               diary.likeCnt AS "likeCnt",
               diary.commentCnt AS "commentCnt",
@@ -125,7 +137,13 @@ const diaryModel = {
         })}
         SELECT
           diary.idx,
-          diary.imgContents AS "imgContents",
+          ARRAY(
+              SELECT concat(
+              'https://${process.env.AWS_BUCKETNAME}.s3.ap-northeast-2.amazonaws.com/'
+              ,account.idx, '/', diary.idx, '/', tmp
+              )
+              FROM unnest(diary.imgContents) AS tmp
+          ) AS "imgContents",
           diary.textContent AS "textContent",
           diary.likeCnt AS "likeCnt",
           diary.commentCnt AS "commentCnt",

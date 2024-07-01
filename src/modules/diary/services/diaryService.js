@@ -100,30 +100,16 @@ const diaryService = {
           imgContents: imgContents,
           bucketFolderPath: path.join(accountIdx.toString(), diaryIdx.toString()),
         }),
-
         // psql
-        Promise.all([
-          poolClient.query(
-            noticeModel.insert({
-              fromAccountIdx: accountIdx,
-              diaryIdx: diaryIdx,
-              noticeType: CONSTANTS.NOTICE_TYPE.NEW_DIARY,
-            }).sql,
-            noticeModel.insert({
-              fromAccountIdx: accountIdx,
-              diaryIdx: diaryIdx,
-              noticeType: CONSTANTS.NOTICE_TYPE.NEW_DIARY,
-            }).values
-          ),
-          poolClient.query(
-            tagModel.insert({ diaryIdx: diaryIdx, tags: tags }).sql,
-            tagModel.insert({ diaryIdx: diaryIdx, tags: tags }).values
-          ),
-          poolClient.query(
-            accountModel.updateDiaryCnt({ accountIdx: accountIdx, isPlus: true }).sql,
-            accountModel.updateDiaryCnt({ accountIdx: accountIdx, isPlus: true }).values
-          ),
-        ]),
+        [
+          noticeModel.insert({
+            fromAccountIdx: accountIdx,
+            diaryIdx: diaryIdx,
+            noticeType: CONSTANTS.NOTICE_TYPE.NEW_DIARY,
+          }),
+          tagModel.insert({ diaryIdx: diaryIdx, tags: tags }),
+          accountModel.updateDiaryCnt({ accountIdx: accountIdx, isPlus: true }),
+        ].map((query) => poolClient.query(query.sql, query.values)),
       ]);
 
       await poolClient.query("COMMIT");
