@@ -28,19 +28,11 @@ const diaryService = {
     const { page } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
 
-    console.log(
-      seedCTE({
-        identifier: accountIdx ? "accountIdx" : "ipAddress",
-        identifierValue: accountIdx || req.ip,
-        isFirstPage: Number(page) === 1,
-      })
+    const result = await psqlConnect.query(
+      diaryModel.selectMain({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip })
     );
 
-    const a = diaryModel.selectMain({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip });
-    // selectMain
-    const result = await psqlConnect.query(a);
-
-    // 404
+    if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
     return result.rows;
   },
