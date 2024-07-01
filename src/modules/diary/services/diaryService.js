@@ -52,9 +52,11 @@ const diaryService = {
     const { page } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
 
-    // selectHome
+    const result = await psqlConnect.query(
+      diaryModel.selectHome({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip })
+    );
 
-    // 404
+    if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
 
     return result.rows;
   },

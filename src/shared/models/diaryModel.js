@@ -153,35 +153,25 @@ const diaryModel = {
       values: [CONSTANTS.RULE.DIARY_MAIN_PAGE_LIMIT, CONSTANTS.RULE.DIARY_MAIN_PAGE_LIMIT * (page - 1)],
     };
   },
-  selectHome: () => {
+  selectHome: ({ accountIdx, ipAddress, page }) => {
     return {
       sql: `
         ${seedCTE({
           identifier: accountIdx ? "accountIdx" : "ipAddress",
           identifierValue: accountIdx || ipAddress,
           isFirstPage: page === 1,
-        })},
-        tagDiaryIdx AS (
-          SELECT DISTINCT diaryIdx 
-          FROM tag 
-          WHERE tagname = ANY($1)
-        )
+        })}
         SELECT 
           diary.idx,
           diary.imgContents[1] AS "thumbnailImg",
-          diary.textContent AS "textContent",
-          diary.likeCnt AS "likeCnt",
-          diary.createdAt AS "createdAt",
-          diary.tags,
           account.nickname,
           account.profileImg AS "profileImg"
         FROM diary
         JOIN account ON diary.accountIdx = account.idx
-        JOIN tagDiaryIdx ON diary.idx = tagDiaryIdx.diaryIdx
         ORDER BY md5(diary.idx::text || (SELECT seed FROM seedRecord)::text)
-        LIMIT $2 OFFSET $3
+        LIMIT $1 OFFSET $2
       `,
-      values: [tags, CONSTANTS.RULE.DIARY_SEARCH_PAGE_LIMIT, CONSTANTS.RULE.DIARY_SEARCH_PAGE_LIMIT * (page - 1)],
+      values: [CONSTANTS.RULE.DIARY_HOME_PAGE_LIMIT, CONSTANTS.RULE.DIARY_HOME_PAGE_LIMIT * (page - 1)],
     };
   },
   selectSearch: ({ accountIdx, ipAddress, tags, page }) => {
