@@ -79,8 +79,8 @@ const diaryService = {
       poolClient = await new pg.Pool(psqlConfig).connect();
       await poolClient.query("BEGIN");
 
-      // first
-      const firstQuery = diaryModel.insert({
+      // insert
+      const insertDiaryQuery = diaryModel.insert({
         textContent,
         imgContents: imgContents.map((img) => img.fileName),
         tags,
@@ -90,31 +90,43 @@ const diaryService = {
       });
       const {
         rows: [{ idx: diaryIdx }],
-      } = await poolClient.query(firstQuery.sql, firstQuery.values);
+      } = await poolClient.query(insertDiaryQuery.sql, insertDiaryQuery.values);
 
-      // second
-      await Promise.all([
-        // s3
-        bucketModel.insertMany({
-          imgContents: imgContents,
-          bucketFolderPath: path.join(accountIdx.toString(), diaryIdx.toString()),
+      // insert
+      // psql
+      const insertQueries = [
+        noticeModel.insert({
+          fromAccountIdx: accountIdx,
+          diaryIdx,
+          noticeType: CONSTANTS.NOTICE_TYPE.NEW_DIARY,
         }),
-        // psql
-        [
-          noticeModel.insert({
-            fromAccountIdx: accountIdx,
-            diaryIdx: diaryIdx,
-            noticeType: CONSTANTS.NOTICE_TYPE.NEW_DIARY,
-          }),
-          tagModel.insert({ diaryIdx: diaryIdx, tags: tags }),
-          accountModel.updateDiaryCnt({ accountIdx: accountIdx, isPlus: true }),
-        ].map((query) => poolClient.query(query.sql, query.values)),
-      ]);
+        tagModel.insert({ diaryIdx, tags }),
+        accountModel.updateDiaryCnt({ accountIdx, isPlus: true }),
+      ];
+
+      await Promise.all(insertQueries.map((query) => poolClient.query(query.sql, query.values)));
+
+      // bucket
+      const bucketOperations =
+        imgContents.length > 0
+          ? [
+              bucketModel.insertMany({
+                imgContents,
+                bucketFolderPath: path.join(accountIdx.toString(), diaryIdx.toString()),
+              }),
+            ]
+          : [];
+
+      await Promise.all(bucketOperations);
 
       await poolClient.query("COMMIT");
     } catch (err) {
       await poolClient.query("ROLLBACK");
-      sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
+      if (err.status) {
+        sendError({ message: err.message, status: err.status, stack: err.stack });
+      } else {
+        sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
+      }
     } finally {
       if (poolClient) poolClient.release();
     }
@@ -122,18 +134,81 @@ const diaryService = {
     return;
   },
   put: async (req, res) => {
-    const { imgContents, deletedImgs, textContents, tags, isPublic, color } = req.body;
+    const { textContent, isPublic, color } = req.body;
+    const tags = typeof req.body.tags === "string" ? JSON.parse(req.body.tags) : req.body.tags || [];
     const { diaryIdx } = req.params;
+    const imgContents = fileFormat(req.files);
     const { accountIdx } = jwt.verify(req.headers.token);
+    const deletedImgs =
+      typeof req.body.deletedImgs === "string" ? JSON.parse(req.body.deletedImgs) : req.body.deletedImgs || [];
 
-    // update
-    // tagUpdate
+    const deletedImgInfo = deletedImgs.map((url) => {
+      const pathname = new URL(url).pathname;
+      return {
+        filePath: pathname,
+        fileName: pathname.substring(pathname.lastIndexOf("/") + 1),
+      };
+    });
 
-    // 404
+    let poolClient;
+    try {
+      poolClient = await new pg.Pool(psqlConfig).connect();
+      await poolClient.query("BEGIN");
 
-    // 403
+      // check
+      const checkQuery = diaryModel.selectAccountIdx({ diaryIdx: diaryIdx });
+      const check = await poolClient.query(checkQuery.sql, checkQuery.values);
 
-    return result.rows;
+      if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
+      if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
+
+      // update
+      // psql
+      const updateQueries = [
+        diaryModel.update({
+          textContent,
+          imgContents: imgContents.map((img) => img.fileName),
+          tags,
+          color,
+          isPublic,
+          accountIdx,
+          deletedImgs: deletedImgInfo.map((img) => img.fileName),
+          diaryIdx,
+        }),
+        tagModel.update({ diaryIdx, tags }),
+      ];
+
+      await Promise.all(updateQueries.map((query) => poolClient.query(query.sql, query.values)));
+
+      // bucket
+      const bucketOperations = [];
+      if (imgContents.length > 0) {
+        bucketOperations.push(
+          bucketModel.insertMany({
+            imgContents,
+            bucketFolderPath: path.join(accountIdx.toString(), diaryIdx.toString()),
+          })
+        );
+      }
+      if (deletedImgInfo.length > 0) {
+        bucketOperations.push(bucketModel.deleteMany({ deletedBucketImgs: deletedImgInfo.map((img) => img.filePath) }));
+      }
+
+      await Promise.all(bucketOperations);
+
+      await poolClient.query("COMMIT");
+    } catch (err) {
+      await poolClient.query("ROLLBACK");
+      if (err.status) {
+        sendError({ message: err.message, status: err.status, stack: err.stack });
+      } else {
+        sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
+      }
+    } finally {
+      if (poolClient) poolClient.release();
+    }
+
+    return;
   },
   delete: async (req, res) => {
     const { diaryIdx } = req.params;

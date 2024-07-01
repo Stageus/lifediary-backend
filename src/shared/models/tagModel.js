@@ -47,6 +47,12 @@ const tagModel = {
       values: [diaryIdx, tags],
     };
   },
+  delete: ({ diaryIdx }) => {
+    return {
+      sql: ``,
+      values: [],
+    };
+  },
 };
 
 export default tagModel;

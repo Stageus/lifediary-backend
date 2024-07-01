@@ -199,7 +199,23 @@ const diaryModel = {
       values: [accountIdx],
     };
   },
-  update: () => {},
+  update: ({ textContent, deletedImgs, imgContents, tags, accountIdx, color, isPublic, diaryIdx }) => {
+    return {
+      sql: `
+        UPDATE diary
+        SET imgContents = (
+            SELECT array_agg(url)
+            FROM unnest(imgContents) AS url
+            WHERE url != ALL($1)) || $2::text[],
+            textContent = $3,
+            tags = $4,
+            color = $5,
+            isPublic = $6
+        WHERE idx = $7 AND accountIdx = $8;
+      `,
+      values: [deletedImgs, imgContents, textContent, tags, color, isPublic, diaryIdx, accountIdx],
+    };
+  },
   updateCommentCnt: ({ diaryIdx, commentIdx, isPlus }) => {
     if (!commentIdx) {
       return {
