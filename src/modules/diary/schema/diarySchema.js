@@ -1,7 +1,3 @@
-// const { z: zod } = require("zod");
-// const { FILETYPE } = require("../../constants");
-// const { fromBuffer: getFileType } = require("file-type");
-
 import fileType from "file-type";
 import CONSTANTS from "../../../shared/utils/constansts.js";
 
