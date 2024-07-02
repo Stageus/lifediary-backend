@@ -9,7 +9,6 @@ const reportController = {
       next(err);
     }
   },
-
   getCnt: async (req, res, next) => {
     try {
       const result = await reportService.getCnt(req, res);

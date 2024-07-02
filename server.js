@@ -27,7 +27,7 @@ server.use("/comment", commentRoute);
 server.use("/grass", grassRoute);
 server.use("/notice", noticeRoute);
 server.use("/report", reportRoute);
-// server.use("/subscription", subscriptionRoute);
+server.use("/subscription", subscriptionRoute);
 server.use("/", exceptionHandler);
 server.use(errorHandler);
 

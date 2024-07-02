@@ -1,4 +1,4 @@
-const noticeSchema = {
+const subscriptionSchema = {
   get: {
     page: {
       in: ["query"],
@@ -6,13 +6,13 @@ const noticeSchema = {
       notEmpty: true,
     },
   },
-  delete: {
-    noticeIdx: {
+  post: {
+    toAccountIdx: {
       in: ["param"],
-      isInt: true,
       notEmpty: true,
+      isInt: true,
     },
   },
 };
 
-export default noticeSchema;
+export default subscriptionSchema;

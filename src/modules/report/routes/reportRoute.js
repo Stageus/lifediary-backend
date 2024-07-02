@@ -8,7 +8,6 @@ import auth from "../../../shared/middlewares/auth.js";
 const reportRoute = express.Router();
 
 reportRoute
-
   .get("/", validator(reportSchema.get), reportController.get)
   .get("/count", reportController.getCnt)
   .get("/new", reportController.getNew)

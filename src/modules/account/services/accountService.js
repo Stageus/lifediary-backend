@@ -60,9 +60,6 @@ const accountService = {
 
   get: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
-    if (!accountIdx) {
-      sendError({ status: 401, message: CONSTANTS.MSG[401] });
-    }
 
     const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ accountIdx: accountIdx }));
     const result = selectedRows.rows[0];
@@ -89,9 +86,6 @@ const accountService = {
 
   putNickname: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
-    if (!accountIdx) {
-      sendError({ status: 401, message: CONSTANTS.MSG[401] });
-    }
     const { nickname } = req.body;
 
     const selectedRows = await psqlConnect.query(accountModel.selectNickname({ nickname: nickname }));
@@ -126,10 +120,6 @@ const accountService = {
     const { accountIdx } = jwt.verify(req.headers.token);
     const { profileImg } = req.body;
 
-    if (!accountIdx) {
-      sendError({ status: 401, message: CONSTANTS.MSG[401] });
-    }
-
     await psqlConnect.query(accountModel.updateProfileImg({ profileImg: profileImg, accountIdx: accountIdx }));
 
     return;
@@ -137,9 +127,6 @@ const accountService = {
 
   delete: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
-    if (!accountIdx) {
-      sendError({ status: 401, message: CONSTANTS.MSG[401] });
-    }
 
     await psqlConnect.query(accountModel.delete({ accountIdx: accountIdx }));
 
@@ -148,9 +135,11 @@ const accountService = {
 
   getOtherAccount: async (req, res) => {
     const { accountidx: otherAccountIdx } = req.params;
+
     const selectedRowsFromAccount = await psqlConnect.query(
       accountModel.selectFromIdx({ accountIdx: otherAccountIdx })
     );
+
     let result = selectedRowsFromAccount.rows[0];
     result.isSubscribed = false;
 

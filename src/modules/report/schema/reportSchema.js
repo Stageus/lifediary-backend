@@ -6,7 +6,6 @@ const reportSchema = {
       notEmpty: true,
     },
   },
-
   post: {
     diaryIdx: {
       in: ["query"],
@@ -19,7 +18,6 @@ const reportSchema = {
       isLength: { options: { min: 5, max: 300 } },
     },
   },
-
   putStatus: {
     isInvalid: {
       in: ["body"],

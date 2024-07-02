@@ -1,7 +1,7 @@
 import accountService from "../services/accountService.js";
 
 const accountController = {
-  oauthGoogle: (req, res) => {
+  oauthGoogle: (req, res, next) => {
     try {
       const result = accountService.oauthGoogle(req, res);
       res.status(200).send(result);
@@ -10,7 +10,7 @@ const accountController = {
     }
   },
 
-  oauthGoogleRedirect: (req, res) => {
+  oauthGoogleRedirect: (req, res, next) => {
     try {
       const result = accountService.oauthGoogleRedirect(req, res);
       res.status(200).send(result);
@@ -19,7 +19,7 @@ const accountController = {
     }
   },
 
-  get: async (req, res) => {
+  get: async (req, res, next) => {
     try {
       const result = await accountService.get(req, res);
       res.status(200).send(result);
@@ -37,7 +37,7 @@ const accountController = {
     }
   },
 
-  putNickname: async (req, res) => {
+  putNickname: async (req, res, next) => {
     try {
       await accountService.putNickname(req, res);
       res.sendStatus(200);
@@ -46,7 +46,7 @@ const accountController = {
     }
   },
 
-  getNicknameDuplication: async (req, res) => {
+  getNicknameDuplication: async (req, res, next) => {
     try {
       const result = await accountService.getNicknameDuplication(req, res);
       res.status(200).send(result);
@@ -55,7 +55,7 @@ const accountController = {
     }
   },
 
-  putProfileImg: async (req, res) => {
+  putProfileImg: async (req, res, next) => {
     try {
       await accountService.putProfileImg(req, res);
       res.sendStatus(200);
@@ -64,7 +64,7 @@ const accountController = {
     }
   },
 
-  delete: async (req, res) => {
+  delete: async (req, res, next) => {
     try {
       await accountService.delete(req, res);
       res.sendStatus(200);
@@ -73,7 +73,7 @@ const accountController = {
     }
   },
 
-  getOtherAccount: async (req, res) => {
+  getOtherAccount: async (req, res, next) => {
     try {
       const result = await accountService.getOtherAccount(req, res);
       res.status(200).send(result);
