@@ -6,9 +6,12 @@ import reportController from "../controllers/reportController.js";
 
 const reportRoute = express.Router();
 
-reportRoute.get("/", validator(reportSchema.get), reportController.get);
-// .get("/report/new", reportController)
-// .post("/report", reportController)
-// .put("/report/:reportIdx/status", reportController);
+reportRoute
+
+  .get("/", validator(reportSchema.get), reportController.get)
+  .get("/count", reportController.getCnt)
+  .get("/new", reportController.getNew)
+  // .post("/report", reportController)
+  .put("/:reportIdx/status", validator(reportSchema.putStatus), reportController.putStatus);
 
 export default reportRoute;

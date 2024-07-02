@@ -19,6 +19,18 @@ const reportModel = {
       values: [CONSTANTS.RULE.REPORT_PAGE_LIMIT, CONSTANTS.RULE.REPORT_PAGE_LIMIT * (page - 1)],
     };
   },
+
+  selectCnt: () => {
+    return {
+      sql: `SELECT COUNT(*) FROM report;`,
+    };
+  },
+
+  selectNew: () => {
+    return {
+      sql: `SELECT idx FROM report WHERE isInvalid IS NULL;`,
+    };
+  },
 };
 
 export default reportModel;
