@@ -69,7 +69,8 @@ const reportService = {
 
     if (isInvalid === false) {
       await psqlConnect.query(reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }));
-    } else if (isInvalid === true) {
+    } //
+    else if (isInvalid === true) {
       const diaryIdx = check.rows[0].diaryIdx;
 
       const queries = [
@@ -89,7 +90,8 @@ const reportService = {
       ];
 
       await psqlConnect.transaction(queries);
-    } else if (isInvalid === null) {
+    } //
+    else if (isInvalid === null) {
       const prevStatus = check.rows[0].isInvalid;
 
       if (prevStatus === false) {
