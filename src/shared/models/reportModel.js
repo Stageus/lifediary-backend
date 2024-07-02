@@ -31,6 +31,16 @@ const reportModel = {
       sql: `SELECT idx FROM report WHERE isInvalid IS NULL;`,
     };
   },
+
+  insert: ({ accountIdx, diaryIdx, textContent }) => {
+    return {
+      sql: `
+            INSERT INTO report (accountIdx, diaryIdx, textContent) 
+            VALUES ($1, $2, $3);
+            `,
+      values: [accountIdx, diaryIdx, textContent],
+    };
+  },
 };
 
 export default reportModel;

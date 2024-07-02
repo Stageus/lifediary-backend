@@ -28,6 +28,15 @@ const reportController = {
     }
   },
 
+  post: async (req, res, next) => {
+    try {
+      await reportService.post(req, res);
+      res.sendStatus(200);
+    } catch (err) {
+      next(err);
+    }
+  },
+
   putStatus: async (req, res, next) => {
     try {
       await reportService.putStatus(req, res);

@@ -1,7 +1,9 @@
 import reportModel from "../../../shared/models/reportModel.js";
+import diaryModel from "../../../shared/models/diaryModel.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
 import sendError from "../../../shared/utils/sendError.js";
 import CONSTANTS from "../../../shared/utils/constansts.js";
+import jwt from "../../../shared/utils/jwt.js";
 
 const reportService = {
   get: async (req, res) => {
@@ -34,6 +36,24 @@ const reportService = {
     }
 
     return { isNew: false };
+  },
+
+  post: async (req, res) => {
+    const { accountIdx } = jwt.verify(req.headers.token);
+    const { diaryIdx } = req.query;
+    const { textContent } = req.body;
+
+    const check = await psqlConnect.query(diaryModel.selectAccountIdx({ diaryIdx: diaryIdx }));
+
+    if (check.rowCount === 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+
+    await psqlConnect.query(
+      reportModel.insert({ accountIdx: accountIdx, diaryIdx: diaryIdx, textContent: textContent })
+    );
+
+    return;
   },
 
   putStatus: async (req, res) => {
