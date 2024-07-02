@@ -178,6 +178,7 @@ const diaryModel = {
           diary.likeCnt AS "likeCnt",
           diary.createdAt AS "createdAt",
           diary.tags,
+          diary.accountIdx AS "accountIdx",
           account.nickname,
           account.profileImg AS "profileImg"
         FROM diary
