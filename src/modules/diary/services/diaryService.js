@@ -17,13 +17,14 @@ const diaryService = {
     const { page } = req.query;
     const { diaryIdx } = req.params;
     const { accountIdx } = jwt.verify(req.headers.token);
+    const { ipAddress } = Number(req.ip.split(".").join(""));
 
     const result = await psqlConnect.query(
       diaryModel.selectMainWithFirstRow({
         accountIdx: accountIdx,
         page: Number(page),
         diaryIdx: diaryIdx,
-        ipAddress: req.ip,
+        ipAddress: ipAddress,
       })
     );
 
@@ -34,9 +35,10 @@ const diaryService = {
   getMain: async (req, res) => {
     const { page } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
+    const { ipAddress } = Number(req.ip.split(".").join(""));
 
     const result = await psqlConnect.query(
-      diaryModel.selectMain({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip })
+      diaryModel.selectMain({ accountIdx: accountIdx, page: Number(page), ipAddress: ipAddress })
     );
 
     if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
@@ -47,9 +49,10 @@ const diaryService = {
     const { page } = req.query;
     const tags = typeof req.query.tags === "string" ? JSON.parse(req.query.tags) : req.query.tags;
     const { accountIdx } = jwt.verify(req.headers.token);
+    const { ipAddress } = Number(req.ip.split(".").join(""));
 
     const result = await psqlConnect.query(
-      diaryModel.selectSearch({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip, tags: tags })
+      diaryModel.selectSearch({ accountIdx: accountIdx, page: Number(page), ipAddress: ipAddress, tags: tags })
     );
 
     if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
@@ -59,9 +62,10 @@ const diaryService = {
   getHome: async (req, res) => {
     const { page } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
+    const { ipAddress } = Number(req.ip.split(".").join(""));
 
     const result = await psqlConnect.query(
-      diaryModel.selectHome({ accountIdx: accountIdx, page: Number(page), ipAddress: req.ip })
+      diaryModel.selectHome({ accountIdx: accountIdx, page: Number(page), ipAddress: ipAddress })
     );
 
     if (result.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
