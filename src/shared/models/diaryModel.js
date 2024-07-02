@@ -79,7 +79,26 @@ const diaryModel = {
       };
     }
   },
-  delete: () => {},
+  delete: ({ diaryIdx }) => {
+    return {
+      sql: `
+        UPDATE diary
+        SET isDeleted = true
+        WHERE idx = $1;
+      `,
+      values: [diaryIdx],
+    };
+  },
+  restore: ({ diaryIdx }) => {
+    return {
+      sql: `
+        UPDATE diary
+        SET isDeleted = false
+        WHERE idx = $1;
+      `,
+      values: [diaryIdx],
+    };
+  },
 };
 
 export default diaryModel;

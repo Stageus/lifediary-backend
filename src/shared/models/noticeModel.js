@@ -59,7 +59,10 @@ const noticeModel = {
       };
     }
     return {
-      sql: ``,
+      sql: `
+            INSERT INTO notice (noticeTypeIdx, fromAccountIdx, toAccountIdx, diaryIdx) 
+            VALUES ( $4, $1, $2, $3)
+            `,
       values: [fromAccountIdx, toAccountIdx, diaryIdx, noticeType],
     };
   },
