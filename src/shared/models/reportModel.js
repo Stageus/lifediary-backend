@@ -14,6 +14,7 @@ const reportModel = {
             FROM report 
             JOIN account 
             ON report.accountidx = account.idx
+            ORDER BY report.createdAt DESC
             LIMIT $1 OFFSET $2
             `,
       values: [CONSTANTS.RULE.REPORT_PAGE_LIMIT, CONSTANTS.RULE.REPORT_PAGE_LIMIT * (page - 1)],
@@ -32,6 +33,18 @@ const reportModel = {
     };
   },
 
+  selectIdx: ({ reportIdx }) => {
+    return {
+      sql: `SELECT 
+            idx, 
+            diaryIdx AS "diaryIdx", 
+            accountIdx AS "accountIdx", 
+            isInvalid AS "isInvalid" 
+            FROM report WHERE idx = $1;`,
+      values: [reportIdx],
+    };
+  },
+
   insert: ({ accountIdx, diaryIdx, textContent }) => {
     return {
       sql: `
@@ -39,6 +52,17 @@ const reportModel = {
             VALUES ($1, $2, $3);
             `,
       values: [accountIdx, diaryIdx, textContent],
+    };
+  },
+
+  update: ({ reportIdx, isInvalid }) => {
+    return {
+      sql: `UPDATE report
+            SET isInvalid = $1,
+            processedAt = CURRENT_TIMESTAMP
+            WHERE idx = $2;
+            `,
+      values: [isInvalid, reportIdx],
     };
   },
 };

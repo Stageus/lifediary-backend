@@ -1,5 +1,6 @@
 import reportModel from "../../../shared/models/reportModel.js";
 import diaryModel from "../../../shared/models/diaryModel.js";
+import noticeModel from "../../../shared/models/noticeModel.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
 import sendError from "../../../shared/utils/sendError.js";
 import CONSTANTS from "../../../shared/utils/constansts.js";
@@ -57,9 +58,62 @@ const reportService = {
   },
 
   putStatus: async (req, res) => {
-    console.log(req.body);
+    const { accountIdx } = jwt.verify(req.headers.token);
+    const { reportIdx } = req.params;
+    const { isInvalid } = req.body;
 
-    return { result: req.body };
+    const check = await psqlConnect.query(reportModel.selectIdx({ reportIdx: reportIdx }));
+    if (check.rowCount === 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+
+    if (isInvalid === false) {
+      await psqlConnect.query(reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }));
+    } else if (isInvalid === true) {
+      const diaryIdx = check.rows[0].diaryIdx;
+
+      const queries = [
+        reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }),
+        diaryModel.delete({ diaryIdx: diaryIdx }),
+        noticeModel.insert({
+          fromAccountIdx: accountIdx,
+          toAccountIdx: check.rows[0].accountIdx,
+          diaryIdx: diaryIdx,
+          noticeType: CONSTANTS.NOTICE_TYPE.DELETED_DIARY,
+        }),
+        noticeModel.insert({
+          fromAccountIdx: accountIdx,
+          diaryIdx: diaryIdx,
+          noticeType: CONSTANTS.NOTICE_TYPE.DELETED_MY_DIARY,
+        }),
+      ];
+
+      await psqlConnect.transaction(queries);
+    } else if (isInvalid === null) {
+      const prevStatus = check.rows[0].isInvalid;
+
+      if (prevStatus === false) {
+        await psqlConnect.query(reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }));
+      }
+
+      if (prevStatus === true) {
+        const diaryIdx = check.rows[0].diaryIdx;
+
+        const queries = [
+          reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }),
+          diaryModel.restore({ diaryIdx: check.rows[0].diaryIdx }),
+          noticeModel.insert({
+            fromAccountIdx: accountIdx,
+            diaryIdx: diaryIdx,
+            noticeType: CONSTANTS.NOTICE_TYPE.RECOVERED_DIARY,
+          }),
+        ];
+
+        await psqlConnect.transaction(queries);
+      }
+    }
+
+    return;
   },
 };
 
