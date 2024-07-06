@@ -11,7 +11,7 @@ const CONSTANTS = Object.freeze({
   RULE: Object.freeze({
     COMMENT_PAGE_LIMIT: 10,
     NOTICE_PAGE_LIMIT: 10,
-    REPORT_PAGE_LIMIT: 10,
+    REPORT_PAGE_LIMIT: 5,
     SUBSCRIPTION_PAGE_LIMIT: 20,
   }),
   NOTICE_TYPE: Object.freeze({

@@ -11,12 +11,13 @@ const reportService = {
     const { page } = req.query;
 
     const selectedRows = await psqlConnect.query(reportModel.selectList({ page: page }));
+    const reportCnt = (await psqlConnect.query(reportModel.selectCnt())).rows[0].maxPage;
 
     if (selectedRows.rowCount == 0) {
       sendError({ status: 404, message: CONSTANTS.MSG[404] });
     }
 
-    const result = selectedRows.rows;
+    const result = { reports: selectedRows.rows, reportCnt: reportCnt };
 
     return result;
   },
