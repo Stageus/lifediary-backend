@@ -25,13 +25,12 @@ const accountModel = {
       sql: `
             SELECT nickname, profileImg AS "profileImg", subscribeCnt AS "subscribeCnt", diaryCnt AS "diaryCnt"
             FROM account
-            WHERE idx = $1 
+            WHERE idx = $1;
             `,
-
       values: [accountIdx],
     };
   },
-  
+
   delete: ({ accountIdx }) => {
     return {
       sql: `
@@ -53,7 +52,7 @@ const accountModel = {
       values: [nickname],
     };
   },
-  
+
   updateNickname: ({ nickname, accountIdx }) => {
     return {
       sql: `
@@ -77,7 +76,6 @@ const accountModel = {
       values: [profileImg, accountIdx],
     };
   },
-
 };
 
 export default accountModel;

@@ -9,14 +9,6 @@ const reportController = {
       next(err);
     }
   },
-  getCnt: async (req, res, next) => {
-    try {
-      const result = await reportService.getCnt(req, res);
-      res.status(200).send(result);
-    } catch (err) {
-      next(err);
-    }
-  },
 
   getNew: async (req, res, next) => {
     try {

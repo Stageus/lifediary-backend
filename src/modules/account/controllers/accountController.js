@@ -10,9 +10,9 @@ const accountController = {
     }
   },
 
-  oauthGoogleRedirect: (req, res, next) => {
+  oauthGoogleRedirect: async (req, res, next) => {
     try {
-      const result = accountService.oauthGoogleRedirect(req, res);
+      const result = await accountService.oauthGoogleRedirect(req, res);
       res.status(200).send(result);
     } catch (err) {
       next(err);

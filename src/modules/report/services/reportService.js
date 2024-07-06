@@ -21,13 +21,6 @@ const reportService = {
     return result;
   },
 
-  getCnt: async (req, res) => {
-    const selectedRows = await psqlConnect.query(reportModel.selectCnt());
-    const result = selectedRows.rows[0].count;
-
-    return result;
-  },
-
   getNew: async (req, res) => {
     const selectedRows = await psqlConnect.query(reportModel.selectNew());
     const newRow = selectedRows.rows[0];

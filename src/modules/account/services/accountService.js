@@ -60,6 +60,7 @@ const accountService = {
 
   get: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
+    console.log(accountIdx);
 
     const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ accountIdx: accountIdx }));
     const result = selectedRows.rows[0];

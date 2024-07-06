@@ -2,7 +2,7 @@ import jwt from "../utils/jwt.js";
 import sendError from "../utils/sendError.js";
 import CONSTANTS from "../utils/constansts.js";
 
-const permission = (schema) => (req, res, next) => {
+const permission = (allowedPermissions) => (req, res, next) => {
   try {
     if (!jwt.verify(req.headers.token)) {
       sendError({ status: 401, message: CONSTANTS.MSG[401] });
@@ -10,7 +10,7 @@ const permission = (schema) => (req, res, next) => {
 
     const { permission } = jwt.verify(req.headers.token);
 
-    if (!schema.includes(permission)) {
+    if (!allowedPermissions.includes(permission)) {
       sendError({ status: 403, message: CONSTANTS.MSG[403] });
     }
     next();

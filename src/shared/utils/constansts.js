@@ -34,6 +34,7 @@ const CONSTANTS = Object.freeze({
     { id: "createdAt", title: "CREATED_AT" },
     { id: "errStack", title: "LOG" },
   ]),
+  ALLOWED_PERMISSION: Object.freeze(["admin"]),
 });
 
 export default CONSTANTS;
