@@ -61,9 +61,12 @@ const reportService = {
       sendError({ status: 404, message: CONSTANTS.MSG[404] });
     }
 
+    // isInvalid의 값은 true, false, null 3가지
+    // false일경우 신고의 처리결과만 수정
     if (isInvalid === false) {
       await psqlConnect.query(reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }));
-    } //
+    }
+    // true일 경우 일기를 삭제해야 하므로 신고의 처리결과 수정, 일기 삭제, 신고자와 일기작성자에게 알림 전송
     else if (isInvalid === true) {
       const diaryIdx = check.rows[0].diaryIdx;
 
@@ -84,15 +87,18 @@ const reportService = {
       ];
 
       await psqlConnect.transaction(queries);
-    } //
+    }
+    // null일 경우 이전의 처리결과에 따라 다르게 처리
     else if (isInvalid === null) {
-      const prevStatus = check.rows[0].isInvalid;
+      const prevIsInvalid = check.rows[0].isInvalid;
 
-      if (prevStatus === false) {
+      // 이전의 처리결과가 false였을 경우 처리결과만 수정
+      if (prevIsInvalid === false) {
         await psqlConnect.query(reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }));
       }
 
-      if (prevStatus === true) {
+      // 이전의 처리결과가 true였을 경우 처리결과 수정, 삭제된 일기 복구, 일기 작성자에게 알림 전송
+      if (prevIsInvalid === true) {
         const diaryIdx = check.rows[0].diaryIdx;
 
         const queries = [
