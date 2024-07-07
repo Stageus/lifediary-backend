@@ -80,31 +80,16 @@ const diaryModel = {
             identifier: accountIdx ? "accountIdx" : "ipAddress",
             identifierValue: accountIdx || ipAddress,
             isFirstPage: page === 1,
-          })},
-          firstRecord AS (
-            SELECT ${mainColumnSelect({ accountIdx })}
-            FROM diary
-            JOIN account ON account.idx = diary.accountIdx
-            WHERE diary.idx = $1
-              AND diary.isDeleted = false
-              AND (diary.isPublic = true OR ${accountIdx ? `diary.accountIdx = ${accountIdx}` : "false"})
-            LIMIT 1
-          ),
-          randomRecords AS (
-            SELECT ${mainColumnSelect({ accountIdx })}
-            FROM diary
-            JOIN account ON account.idx = diary.accountIdx
-            WHERE diary.idx != $1
-              AND diary.isDeleted = false
-              AND (diary.isPublic = true OR ${accountIdx ? `diary.accountIdx = ${accountIdx}` : "false"})
-            ORDER BY md5(diary.idx::text || (SELECT seed FROM seedRecord))
-          ),
-          combined AS (
-            SELECT * FROM firstRecord
-            UNION ALL
-            SELECT * FROM randomRecords
-          )
-          SELECT * FROM combined
+          })}
+          SELECT ${mainColumnSelect({ accountIdx })}
+          FROM diary
+          JOIN account ON account.idx = diary.accountIdx
+          WHERE 
+            diary.isDeleted = false
+            AND (diary.isPublic = true OR ${accountIdx ? `diary.accountIdx = ${accountIdx}` : "false"})
+          ORDER BY 
+            CASE WHEN diary.idx = $1 THEN 0 ELSE 1 END, 
+            md5(diary.idx::text || (SELECT seed FROM seedRecord))
           LIMIT $2 OFFSET $3
           `,
       values: [diaryIdx, CONSTANTS.RULE.DIARY_MAIN_PAGE_LIMIT, CONSTANTS.RULE.DIARY_MAIN_PAGE_LIMIT * (page - 1)],

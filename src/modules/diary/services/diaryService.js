@@ -17,7 +17,8 @@ const diaryService = {
     const { page } = req.query;
     const { diaryIdx } = req.params;
     const { accountIdx } = jwt.verify(req.headers.token);
-    const { ipAddress } = Number(req.ip.split(".").join(""));
+    // const ipAddress = Number(req.ip.split(".").join(""));
+    const ipAddress = req.ip;
 
     const result = await psqlConnect.query(
       diaryModel.selectMainWithFirstRow({
@@ -35,7 +36,8 @@ const diaryService = {
   getMain: async (req, res) => {
     const { page } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
-    const { ipAddress } = Number(req.ip.split(".").join(""));
+    // const ipAddress = Number(req.ip.split(".").join(""));
+    const ipAddress = req.ip;
 
     const result = await psqlConnect.query(
       diaryModel.selectMain({ accountIdx: accountIdx, page: Number(page), ipAddress: ipAddress })
@@ -49,7 +51,8 @@ const diaryService = {
     const { page } = req.query;
     const tags = typeof req.query.tags === "string" ? JSON.parse(req.query.tags) : req.query.tags;
     const { accountIdx } = jwt.verify(req.headers.token);
-    const { ipAddress } = Number(req.ip.split(".").join(""));
+    // const ipAddress = Number(req.ip.split(".").join(""));
+    const ipAddress = req.ip;
 
     const result = await psqlConnect.query(
       diaryModel.selectSearch({ accountIdx: accountIdx, page: Number(page), ipAddress: ipAddress, tags: tags })
@@ -62,7 +65,8 @@ const diaryService = {
   getHome: async (req, res) => {
     const { page } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
-    const { ipAddress } = Number(req.ip.split(".").join(""));
+    // const ipAddress = Number(req.ip.split(".").join(""));
+    const ipAddress = req.ip;
 
     const result = await psqlConnect.query(
       diaryModel.selectHome({ accountIdx: accountIdx, page: Number(page), ipAddress: ipAddress })
