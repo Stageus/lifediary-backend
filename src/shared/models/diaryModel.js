@@ -265,6 +265,16 @@ const diaryModel = {
       values: [diaryIdx],
     };
   },
+  restore: ({ diaryIdx }) => {
+    return {
+      sql: `
+        UPDATE diary
+        SET isDeleted = false
+        WHERE idx = $1;
+      `,
+      values: [diaryIdx],
+    };
+  },
 };
 
 export default diaryModel;

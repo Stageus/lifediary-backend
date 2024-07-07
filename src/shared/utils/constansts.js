@@ -13,6 +13,7 @@ const CONSTANTS = Object.freeze({
     DIARY_SEARCH_PAGE_LIMIT: 10,
     DIARY_HOME_PAGE_LIMIT: 15,
     NOTICE_PAGE_LIMIT: 10,
+    REPORT_PAGE_LIMIT: 10,
     SUBSCRIPTION_PAGE_LIMIT: 20,
     VALID_FILE_TYPE: Object.freeze(["png", "gif", "jpg", "jpeg"]),
   }),
