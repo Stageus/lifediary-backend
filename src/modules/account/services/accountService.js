@@ -60,6 +60,7 @@ const accountService = {
 
   get: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
+    console.log(accountIdx);
 
     const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ accountIdx: accountIdx }));
     const result = selectedRows.rows[0];
@@ -143,11 +144,15 @@ const accountService = {
     let result = selectedRowsFromAccount.rows[0];
     result.isSubscribed = false;
 
+    // 접속한 사용자가 회원일경우 자신이 구독중인지 아닌지 여부도 표시
     if (jwt.verify(req.headers.token)) {
       const { accountIdx } = jwt.verify(req.headers.token);
       const selectedRowsFromSubscription = await psqlConnect.query(
         subscriptionModel.select({ fromAccountIdx: accountIdx, toAccountIdx: otherAccountIdx })
       );
+
+      // subscription 테이블은 soft-delete로 구현되어 있음 (처음엔 insert -> 이후 update)
+      // 따라서 subscription 테이블에 row가 있어도 isDeleted의 boolean값을 확인해야 함
       if (selectedRowsFromSubscription.rows[0]) {
         const isDeleted = selectedRowsFromSubscription.rows[0].isDeleted;
         if (isDeleted === false) {

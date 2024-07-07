@@ -13,7 +13,7 @@ const CONSTANTS = Object.freeze({
     DIARY_SEARCH_PAGE_LIMIT: 10,
     DIARY_HOME_PAGE_LIMIT: 15,
     NOTICE_PAGE_LIMIT: 10,
-    REPORT_PAGE_LIMIT: 10,
+    REPORT_PAGE_LIMIT: 5,
     SUBSCRIPTION_PAGE_LIMIT: 20,
     VALID_FILE_TYPE: Object.freeze(["png", "gif", "jpg", "jpeg"]),
   }),
@@ -37,6 +37,7 @@ const CONSTANTS = Object.freeze({
     { id: "createdAt", title: "CREATED_AT" },
     { id: "errStack", title: "LOG" },
   ]),
+  ALLOWED_PERMISSION: Object.freeze(["admin"]),
 });
 
 export default CONSTANTS;

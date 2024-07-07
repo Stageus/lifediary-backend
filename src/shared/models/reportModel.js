@@ -23,7 +23,14 @@ const reportModel = {
 
   selectCnt: () => {
     return {
-      sql: `SELECT COUNT(*) FROM report;`,
+      sql: `
+            WITH reportCnt AS (
+            SELECT COUNT(*) AS reports FROM report
+            )
+            SELECT (reports + $1) / $2 AS "maxPage"
+            FROM reportCnt;
+            `,
+      values: [CONSTANTS.RULE.REPORT_PAGE_LIMIT - 1, CONSTANTS.RULE.REPORT_PAGE_LIMIT],
     };
   },
 

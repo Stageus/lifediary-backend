@@ -25,9 +25,8 @@ const accountModel = {
       sql: `
             SELECT nickname, profileImg AS "profileImg", subscribeCnt AS "subscribeCnt", diaryCnt AS "diaryCnt"
             FROM account
-            WHERE idx = $1 
+            WHERE idx = $1;
             `,
-
       values: [accountIdx],
     };
   },
@@ -77,7 +76,6 @@ const accountModel = {
       values: [profileImg, accountIdx],
     };
   },
-
   updateDiaryCnt: ({ accountIdx, isPlus }) => {
     return {
       sql: `
