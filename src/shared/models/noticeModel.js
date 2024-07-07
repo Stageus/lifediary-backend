@@ -42,7 +42,7 @@ const noticeModel = {
     };
   },
   insert: ({ fromAccountIdx, toAccountIdx, diaryIdx, noticeType }) => {
-    if (!toAccountIdx) {
+    if (noticeType === CONSTANTS.NOTICE_TYPE.NEW_COMMENT) {
       return {
         sql: `
           WITH getDiaryOwner AS (
@@ -54,6 +54,17 @@ const noticeModel = {
           SELECT $1, $2, getDiaryOwner.accountIdx, $3
           FROM getDiaryOwner
           WHERE EXISTS ( SELECT accountIdx FROM getDiaryOwner );
+        `,
+        values: [noticeType, fromAccountIdx, diaryIdx],
+      };
+    } else if (noticeType === CONSTANTS.NOTICE_TYPE.NEW_DIARY) {
+      return {
+        sql: `
+          INSERT INTO notice (noticeTypeIdx, fromAccountIdx, toAccountIdx, diaryIdx)
+          SELECT $1, $2, subscription.fromAccountIdx, $3
+          FROM subscription 
+          WHERE subscription.toAccountIdx = $2 AND 
+            subscription.isDeleted = false;
         `,
         values: [noticeType, fromAccountIdx, diaryIdx],
       };

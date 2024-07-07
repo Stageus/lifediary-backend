@@ -7,7 +7,7 @@ import psqlConnect from "../../../shared/utils/psqlConnect.js";
 import sendError from "../../../shared/utils/sendError.js";
 
 const commentService = {
-  selectComments: async (req, res) => {
+  getComments: async (req, res) => {
     const { page, diaryIdx } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
 
@@ -19,7 +19,7 @@ const commentService = {
 
     return result.rows;
   },
-  insert: async (req, res) => {
+  post: async (req, res) => {
     const { diaryIdx } = req.query;
     const { textContent } = req.body;
     const { accountIdx } = jwt.verify(req.headers.token);
@@ -47,7 +47,7 @@ const commentService = {
 
     return;
   },
-  insertReply: async (req, res) => {
+  postReply: async (req, res) => {
     const { parentCommentIdx } = req.params;
     const { textContent } = req.body;
     const { accountIdx } = jwt.verify(req.headers.token);
