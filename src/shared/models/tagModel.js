@@ -1,5 +1,5 @@
 const tagModel = {
-  insertMany: ({ diaryIdx, tags }) => {
+  insert: ({ diaryIdx, tags }) => {
     return {
       sql: `
           INSERT INTO tag (diaryIdx, tagName)
@@ -9,7 +9,7 @@ const tagModel = {
       values: [diaryIdx, tags],
     };
   },
-  updateMany: ({ diaryIdx, tags }) => {
+  update: ({ diaryIdx, tags }) => {
     return {
       sql: `
         WITH newTags AS ( 
@@ -45,6 +45,12 @@ const tagModel = {
         );
     `,
       values: [diaryIdx, tags],
+    };
+  },
+  delete: ({ diaryIdx }) => {
+    return {
+      sql: ``,
+      values: [],
     };
   },
 };

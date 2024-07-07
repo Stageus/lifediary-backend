@@ -3,7 +3,7 @@ import commentService from "../services/commentService.js";
 const commentController = {
   get: async (req, res, next) => {
     try {
-      const result = await commentService.selectComments(req, res);
+      const result = await commentService.getComments(req, res);
       res.status(200).send(result);
     } catch (err) {
       return next(err);
@@ -11,7 +11,7 @@ const commentController = {
   },
   post: async (req, res, next) => {
     try {
-      const result = await commentService.insert(req, res);
+      const result = await commentService.post(req, res);
       res.status(200).send(result);
     } catch (err) {
       return next(err);
@@ -19,7 +19,7 @@ const commentController = {
   },
   postReply: async (req, res, next) => {
     try {
-      const result = await commentService.insertReply(req, res);
+      const result = await commentService.postReply(req, res);
       res.status(200).send(result);
     } catch (err) {
       return next(err);
