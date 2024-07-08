@@ -135,7 +135,8 @@ const accountService = {
   },
 
   getOtherAccount: async (req, res) => {
-    const { accountidx: otherAccountIdx } = req.params;
+    const { accountIdx: otherAccountIdx } = req.params;
+    console.log(otherAccountIdx);
 
     const selectedRowsFromAccount = await psqlConnect.query(
       accountModel.selectFromIdx({ accountIdx: otherAccountIdx })

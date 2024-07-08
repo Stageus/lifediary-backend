@@ -63,7 +63,7 @@ const reportService = {
     }
     const diaryIdx = check.rows[0].diaryIdx;
 
-    const selectedRows = await psqlConnect.query(diaryModel.selectAccountIdx({ diaryIdx: diaryIdx }));
+    const selectedRows = await psqlConnect.query(diaryModel.selectAccountIdxAll({ diaryIdx: diaryIdx }));
     const diaryWriterIdx = selectedRows.rows[0].accountIdx;
 
     // isInvalid의 값은 true, false, null 3가지
