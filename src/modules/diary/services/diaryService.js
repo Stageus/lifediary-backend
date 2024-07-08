@@ -235,6 +235,22 @@ const diaryService = {
 
     return;
   },
+  getUserpage: async (req, res) => {
+    const { page, beginDate, endDate } = req.query;
+    const { accountIdx } = req.params;
+
+    console.log(page, accountIdx);
+
+    const selectedRows = await psqlConnect.query(
+      diaryModel.selectFromAccount({ accountIdx: accountIdx, page: page, otherAccount: true, beginDate, endDate })
+    );
+    if (selectedRows.rowCount === 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+    const result = selectedRows.rows;
+
+    return result;
+  },
 };
 
 export default diaryService;
