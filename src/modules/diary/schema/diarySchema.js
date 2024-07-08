@@ -266,6 +266,13 @@ const diarySchema = {
       optional: true,
     },
   },
+  getMypageLike: {
+    page: {
+      in: ["query"],
+      isInt: true,
+      notEmpty: true,
+    },
+  },
 };
 
 export default diarySchema;

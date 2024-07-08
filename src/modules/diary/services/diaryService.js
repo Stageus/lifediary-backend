@@ -11,6 +11,7 @@ import noticeModel from "../../../shared/models/noticeModel.js";
 import tagModel from "../../../shared/models/tagModel.js";
 import fileFormat from "../../../shared/utils/fileFormat.js";
 import accountModel from "../../../shared/models/accountModel.js";
+import likeModel from "../../../shared/models/likeModel.js";
 
 const diaryService = {
   getMainWithFirstData: async (req, res) => {
@@ -242,6 +243,20 @@ const diaryService = {
     const selectedRows = await psqlConnect.query(
       diaryModel.selectFromAccount({ accountIdx: accountIdx, page: page, otherAccount: false, beginDate, endDate })
     );
+    if (selectedRows.rowCount === 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+    const result = selectedRows.rows;
+
+    return result;
+  },
+  getMypageLike: async (req, res) => {
+    const { page } = req.query;
+    const { accountIdx } = jwt.verify(req.headers.token);
+
+    console.log(page, accountIdx);
+
+    const selectedRows = await psqlConnect.query(likeModel.selectLists({ accountIdx: accountIdx, page: page }));
     if (selectedRows.rowCount === 0) {
       sendError({ status: 404, message: CONSTANTS.MSG[404] });
     }
