@@ -36,7 +36,26 @@ const subscriptionService = {
       sendError({ status: 404, message: CONSTANTS.MSG[404] });
     }
 
-    await psqlConnect.query(subscriptionModel.insert({ fromAccountIdx: accountIdx, toAccountIdx: toAccountIdx }));
+    // 1. 현재 구독중인지 아닌지 셀렉트
+    const selectedRows = await psqlConnect.query(
+      subscriptionModel.select({ fromAccountIdx: accountIdx, toAccountIdx: toAccountIdx })
+    );
+    const isSubscribed = selectedRows.rows[0]?.isDeleted === true ? true : false;
+
+    // 2-1. 현재 구독중이라면 구독 해제, 구독자수 -1 묶어서 트랜잭션
+    if (isSubscribed) {
+      await psqlConnect.transaction([
+        subscriptionModel.update({ fromAccountIdx: accountIdx, toAccountIdx: toAccountIdx, status: false }),
+        accountModel.updateSubscribeCnt({ accountIdx: toAccountIdx, isPlus: false }),
+      ]);
+    }
+    // 2-2. 현재 구독중이 아니라면 upsert, 구독자수 +1 묶어서 트랜잭션
+    else {
+      await psqlConnect.transaction([
+        subscriptionModel.insert({ fromAccountIdx: accountIdx, toAccountIdx: toAccountIdx }),
+        accountModel.updateSubscribeCnt({ accountIdx: toAccountIdx, isPlus: true }),
+      ]);
+    }
 
     return;
   },

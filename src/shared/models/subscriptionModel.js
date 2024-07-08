@@ -49,6 +49,17 @@ const subscriptionModel = {
       values: [fromAccountIdx, toAccountIdx],
     };
   },
+
+  update: ({ fromAccountIdx, toAccountIdx, status }) => {
+    return {
+      sql: `
+          UPDATE subscription 
+          SET isDeleted = $1 
+          WHERE fromAccountIdx = $2 AND toAccountIdx = $3;
+          `,
+      values: [status, fromAccountIdx, toAccountIdx],
+    };
+  },
 };
 
 export default subscriptionModel;
