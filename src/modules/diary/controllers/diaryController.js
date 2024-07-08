@@ -57,6 +57,22 @@ const diaryController = {
       return next(err);
     }
   },
+  getMypageMine: async (req, res, next) => {
+    try {
+      const result = await diaryService.getMypageMine(req, res);
+      res.status(200).send(result);
+    } catch (err) {
+      return next(err);
+    }
+  },
+  getMypageLike: async (req, res, next) => {
+    try {
+      const result = await diaryService.getMypageLike(req, res);
+      res.status(200).send(result);
+    } catch (err) {
+      return next(err);
+    }
+  },
 };
 
 export default diaryController;
