@@ -14,6 +14,7 @@ diaryRoute //
   .get("/", validator(diarySchema.getMain), diaryController.getMain)
   .post("/", auth, upload.array("imgContents"), validator(diarySchema.post), diaryController.post)
   .put("/:diaryIdx", auth, upload.array("imgContents"), validator(diarySchema.put), diaryController.put)
-  .delete("/:diaryIdx", auth, validator(diarySchema.delete), diaryController.delete);
+  .delete("/:diaryIdx", auth, validator(diarySchema.delete), diaryController.delete)
+  .get("/mypage/mine", auth, validator(diarySchema.getMypageMine), diaryController.getMypageMine);
 
 export default diaryRoute;

@@ -245,6 +245,27 @@ const diarySchema = {
       notEmpty: true,
     },
   },
+  getMypageMine: {
+    page: {
+      in: ["query"],
+      isInt: true,
+      notEmpty: true,
+    },
+    beginDate: {
+      in: ["query"],
+      matches: {
+        options: [/^\d{4}-\d{2}-\d{2}$/],
+      },
+      optional: true,
+    },
+    endDate: {
+      in: ["query"],
+      matches: {
+        options: [/^\d{4}-\d{2}-\d{2}$/],
+      },
+      optional: true,
+    },
+  },
 };
 
 export default diarySchema;
