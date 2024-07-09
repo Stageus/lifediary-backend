@@ -275,6 +275,19 @@ const diaryModel = {
       values: [diaryIdx],
     };
   },
+  updateLikeCnt: ({ diaryIdx, isPlus }) => {
+    return {
+      sql: `
+          UPDATE diary
+          SET likeCnt = CASE
+            WHEN $1 THEN likeCnt + 1
+            ELSE likeCnt - 1
+          END
+          WHERE idx = $2;
+        `,
+      values: [isPlus, diaryIdx],
+    };
+  },
   selectFromAccount: ({ accountIdx, page, otherAccount, beginDate = "2000-01-01", endDate = "2099-12-31" }) => {
     if (otherAccount) {
       return {};

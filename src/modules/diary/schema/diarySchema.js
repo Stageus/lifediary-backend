@@ -245,6 +245,13 @@ const diarySchema = {
       notEmpty: true,
     },
   },
+  like: {
+    diaryIdx: {
+      in: ["param"],
+      isInt: true,
+      notEmpty: true,
+    },
+  },
   getMypageMine: {
     page: {
       in: ["query"],
