@@ -15,6 +15,8 @@ diaryRoute //
   .post("/", auth, upload.array("imgContents"), validator(diarySchema.post), diaryController.post)
   .put("/:diaryIdx", auth, upload.array("imgContents"), validator(diarySchema.put), diaryController.put)
   .delete("/:diaryIdx", auth, validator(diarySchema.delete), diaryController.delete)
-  .post("/:diaryIdx/like", auth, validator(diarySchema.like), diaryController.postLike);
+  .post("/:diaryIdx/like", auth, validator(diarySchema.like), diaryController.postLike)
+  .get("/mypage/mine", auth, validator(diarySchema.getMypageMine), diaryController.getMypageMine)
+  .get("/mypage/like", auth, validator(diarySchema.getMypageLike), diaryController.getMypageLike);
 
 export default diaryRoute;

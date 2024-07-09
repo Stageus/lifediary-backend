@@ -288,6 +288,33 @@ const diaryModel = {
       values: [isPlus, diaryIdx],
     };
   },
+  selectFromAccount: ({ accountIdx, page, otherAccount, beginDate = "2000-01-01", endDate = "2099-12-31" }) => {
+    if (otherAccount) {
+      return {};
+    } else {
+      return {
+        sql: `
+              SELECT 
+                idx, 
+                imgContents[1] AS "thumbnail", 
+                isPublic AS "isPublic" 
+              FROM diary 
+              WHERE 
+                accountIdx = $1 AND
+                createdAt BETWEEN $4 AND $5
+              ORDER BY createdAt DESC
+              LIMIT $2 OFFSET $3;    
+              `,
+        values: [
+          accountIdx,
+          CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT,
+          CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT * (page - 1),
+          beginDate,
+          endDate,
+        ],
+      };
+    }
+  },
 };
 
 export default diaryModel;

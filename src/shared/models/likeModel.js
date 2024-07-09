@@ -1,3 +1,5 @@
+import CONSTANTS from "../utils/constansts.js";
+
 const likeModel = {
   insertWithUpdate: ({ accountIdx, diaryIdx }) => {
     return {
@@ -32,6 +34,23 @@ const likeModel = {
             WHERE accountIdx = $2 AND diaryIdx = $3;
             `,
       values: [status, accountIdx, diaryIdx],
+      };
+  },
+  selectLists: ({ accountIdx, page }) => {
+    return {
+      sql: `
+          SELECT 
+            "like".idx,
+            imgContents[1] AS "thumbnail"
+          FROM "like" 
+          JOIN diary 
+          ON "like".diaryIdx = diary.idx
+          WHERE 
+            "like".accountIdx = $1 AND
+            "like".isDeleted = false
+          ORDER BY "like".createdAt DESC
+          LIMIT $2 OFFSET $3`,
+      values: [accountIdx, CONSTANTS.RULE.DIARY_LIKE_PAGE_LIMIT, CONSTANTS.RULE.DIARY_LIKE_PAGE_LIMIT * (page - 1)],
     };
   },
 };

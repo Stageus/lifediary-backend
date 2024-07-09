@@ -258,6 +258,34 @@ const diaryService = {
     await psqlConnect.transaction(queries);
     return;
   },
+  getMypageMine: async (req, res) => {
+    const { page, beginDate, endDate } = req.query;
+    const { accountIdx } = jwt.verify(req.headers.token);
+
+    const selectedRows = await psqlConnect.query(
+      diaryModel.selectFromAccount({ accountIdx: accountIdx, page: page, otherAccount: false, beginDate, endDate })
+    );
+    if (selectedRows.rowCount === 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+    const result = selectedRows.rows;
+
+    return result;
+  },
+  getMypageLike: async (req, res) => {
+    const { page } = req.query;
+    const { accountIdx } = jwt.verify(req.headers.token);
+
+    console.log(page, accountIdx);
+
+    const selectedRows = await psqlConnect.query(likeModel.selectLists({ accountIdx: accountIdx, page: page }));
+    if (selectedRows.rowCount === 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+    const result = selectedRows.rows;
+
+    return result;
+  },
 };
 
 export default diaryService;
