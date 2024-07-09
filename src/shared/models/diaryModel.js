@@ -275,6 +275,16 @@ const diaryModel = {
       values: [diaryIdx],
     };
   },
+  selectAccountIdxAll: ({ diaryIdx }) => {
+    return {
+      sql: `
+            SELECT accountIdx AS "accountIdx" 
+            FROM diary 
+            WHERE idx = $1;
+            `,
+      values: [diaryIdx],
+    };
+  },
   updateLikeCnt: ({ diaryIdx, isPlus }) => {
     return {
       sql: `
