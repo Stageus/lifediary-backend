@@ -11,6 +11,7 @@ import noticeModel from "../../../shared/models/noticeModel.js";
 import tagModel from "../../../shared/models/tagModel.js";
 import fileFormat from "../../../shared/utils/fileFormat.js";
 import accountModel from "../../../shared/models/accountModel.js";
+import likeModel from "../../../shared/models/likeModel.js";
 
 const diaryService = {
   getMainWithFirstData: async (req, res) => {
@@ -234,6 +235,56 @@ const diaryService = {
     ]);
 
     return;
+  },
+  postLike: async (req, res) => {
+    const { diaryIdx } = req.params;
+    const { accountIdx } = jwt.verify(req.headers.token);
+
+    const check = await psqlConnect.query(diaryModel.selectAccountIdx({ diaryIdx: diaryIdx }));
+    if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
+
+    const queries = [];
+    const selectedRows = await psqlConnect.query(likeModel.select({ accountIdx: accountIdx, diaryIdx: diaryIdx }));
+    const isLiked = !selectedRows.rows[0]?.isDeleted;
+
+    if (!isLiked) {
+      queries.push(diaryModel.updateLikeCnt({ diaryIdx: diaryIdx, isPlus: true }));
+      queries.push(likeModel.updateIsDeleted({ accountIdx: accountIdx, diaryIdx: diaryIdx, status: false }));
+    } else if (isLiked) {
+      queries.push(diaryModel.updateLikeCnt({ diaryIdx: diaryIdx, isPlus: false }));
+      queries.push(likeModel.insertWithUpdate({ accountIdx: accountIdx, diaryIdx: diaryIdx }));
+    }
+
+    await psqlConnect.transaction(queries);
+    return;
+  },
+  getMypageMine: async (req, res) => {
+    const { page, beginDate, endDate } = req.query;
+    const { accountIdx } = jwt.verify(req.headers.token);
+
+    const selectedRows = await psqlConnect.query(
+      diaryModel.selectFromAccount({ accountIdx: accountIdx, page: page, otherAccount: false, beginDate, endDate })
+    );
+    if (selectedRows.rowCount === 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+    const result = selectedRows.rows;
+
+    return result;
+  },
+  getMypageLike: async (req, res) => {
+    const { page } = req.query;
+    const { accountIdx } = jwt.verify(req.headers.token);
+
+    console.log(page, accountIdx);
+
+    const selectedRows = await psqlConnect.query(likeModel.selectLists({ accountIdx: accountIdx, page: page }));
+    if (selectedRows.rowCount === 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+    const result = selectedRows.rows;
+
+    return result;
   },
 };
 
