@@ -89,6 +89,19 @@ const accountModel = {
       values: [isPlus, accountIdx],
     };
   },
+  updateSubscribeCnt: ({ accountIdx, isPlus }) => {
+    return {
+      sql: `
+          UPDATE account
+          SET subscribeCnt = CASE
+            WHEN $1 THEN subscribeCnt + 1
+            ELSE subscribeCnt - 1
+          END
+          WHERE idx = $2;
+        `,
+      values: [isPlus, accountIdx],
+    };
+  },
 };
 
 export default accountModel;
