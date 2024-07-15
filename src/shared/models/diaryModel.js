@@ -180,8 +180,8 @@ const diaryModel = {
   },
   selectGrass: ({ accountIdx, year }) => {
     const period = year
-      ? `DATE '${year - 1}-01-01',
-        DATE '${year - 1}-12-31',`
+      ? `DATE '${year}-01-01',
+        DATE '${year}-12-31',`
       : `CURRENT_DATE - INTERVAL '1 year', 
         CURRENT_DATE,`;
 
