@@ -57,6 +57,14 @@ const diaryController = {
       return next(err);
     }
   },
+  getUserpage: async (req, res, next) => {
+    try {
+      const result = await diaryService.getUserpage(req, res);
+      res.status(200).send(result);
+    } catch (err) {
+      return next(err);
+    }
+  },
   postLike: async (req, res, next) => {
     try {
       const result = await diaryService.postLike(req, res);

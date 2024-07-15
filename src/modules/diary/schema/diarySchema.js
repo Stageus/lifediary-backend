@@ -245,6 +245,13 @@ const diarySchema = {
       notEmpty: true,
     },
   },
+  getUserpage: {
+    accountIdx: {
+      in: ["param"],
+      isInt: true,
+      notEmpty: true,
+    },
+  },
   like: {
     diaryIdx: {
       in: ["param"],

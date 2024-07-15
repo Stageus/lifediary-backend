@@ -275,6 +275,52 @@ const diaryModel = {
       values: [diaryIdx],
     };
   },
+  selectFromAccount: ({ accountIdx, page, otherAccount, beginDate = "2000-01-01", endDate = "2099-12-31" }) => {
+    if (otherAccount) {
+      return {
+        sql: `
+              SELECT
+                idx,
+                imgContents[1] AS "thumbnail"
+              FROM diary
+              WHERE
+                accountIdx = $1 AND
+                isPublic = true AND
+                isDeleted = false AND
+                createdAt BETWEEN $4 AND $5
+              ORDER BY createdAt DESC
+              LIMIT $2 OFFSET $3;
+       values: [
+          accountIdx,
+          CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT,
+          CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT * (page - 1),
+          beginDate,
+          endDate,
+        ],
+      };
+   } //
+    else {
+      return {
+        sql: `
+            SELECT 
+              idx, 
+              imgContents[1] AS "thumbnail", 
+              isPublic AS "isPublic" 
+            FROM diary 
+            WHERE 
+              accountIdx = $1 AND
+              createdAt BETWEEN $4 AND $5
+            ORDER BY createdAt DESC
+            LIMIT $2 OFFSET $3;    
+            `,
+        values: [
+          accountIdx,
+          CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT,
+          CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT * (page - 1),
+          beginDate,
+          endDate,
+        ],
+      };
   selectAccountIdxAll: ({ diaryIdx }) => {
     return {
       sql: `
@@ -297,33 +343,6 @@ const diaryModel = {
         `,
       values: [isPlus, diaryIdx],
     };
-  },
-  selectFromAccount: ({ accountIdx, page, otherAccount, beginDate = "2000-01-01", endDate = "2099-12-31" }) => {
-    if (otherAccount) {
-      return {};
-    } else {
-      return {
-        sql: `
-              SELECT 
-                idx, 
-                imgContents[1] AS "thumbnail", 
-                isPublic AS "isPublic" 
-              FROM diary 
-              WHERE 
-                accountIdx = $1 AND
-                createdAt BETWEEN $4 AND $5
-              ORDER BY createdAt DESC
-              LIMIT $2 OFFSET $3;    
-              `,
-        values: [
-          accountIdx,
-          CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT,
-          CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT * (page - 1),
-          beginDate,
-          endDate,
-        ],
-      };
-    }
   },
 };
 
