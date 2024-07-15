@@ -34,6 +34,7 @@ const mainColumnSelect = ({ accountIdx }) => `
   diary.likeCnt AS "likeCnt",
   diary.commentCnt AS "commentCnt",
   diary.createdAt AS "createdAt",
+  diary.accountIdx AS "accountIdx",
   account.nickname,
   account.profileImg AS "profileImg",
   ${
@@ -47,8 +48,11 @@ const mainColumnSelect = ({ accountIdx }) => `
           SELECT 1 FROM "like" 
           WHERE accountIdx = '${accountIdx}' AND "like".diaryIdx = diary.idx AND "like".isDeleted = false) THEN true
         ELSE false
-      END AS "isLiked"`
-      : `false AS isSubscribed, false AS "isLiked"`
+      END AS "isLiked",
+      CASE WHEN diary.accountIdx = '${accountIdx}' THEN true
+        ELSE false
+      END AS "isMine"`
+      : `false AS isSubscribed, false AS "isLiked", false AS "isMine"`
   }
 `;
 
@@ -160,12 +164,12 @@ const diaryModel = {
             process.env.AWS_BUCKETNAME
           }.s3.ap-northeast-2.amazonaws.com/' || account.idx || '/' || diary.idx || '/' || diary.imgContents[1] AS "thumbnailImg",
           diary.textContent AS "textContent",
-          diary.likeCnt AS "likeCnt",
-          diary.createdAt AS "createdAt",
-          diary.tags,
           diary.accountIdx AS "accountIdx",
           account.nickname,
-          account.profileImg AS "profileImg"
+          account.profileImg AS "profileImg",
+          diary.likeCnt AS "likeCnt",
+          diary.createdAt AS "createdAt",
+          diary.tags
         FROM diary
         JOIN account ON diary.accountIdx = account.idx
         JOIN tagDiaryIdx ON diary.idx = tagDiaryIdx.diaryIdx
