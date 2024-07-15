@@ -26,19 +26,26 @@ const diarySchema = {
       in: ["query"],
       custom: {
         options: (value) => {
-          const tags = typeof value === "string" ? JSON.parse(value) : value || [];
-          if (!Array.isArray(tags)) {
-            return false;
-          }
-          for (const tag of tags) {
-            if (!typeof tag === "string") {
-              return false;
-            }
+          if (typeof value === "string") {
+            const tag = value;
+
             if (tag.length > 20) {
               return false;
             }
+
+            return true;
+          } //
+          else if (Array.isArray(value)) {
+            const tags = value;
+            for (const tag of tags) {
+              if (tag.length > 20) {
+                return false;
+              }
+            }
+
+            return true;
           }
-          return true;
+          return false;
         },
       },
       notEmpty: true,
@@ -61,7 +68,7 @@ const diarySchema = {
       custom: {
         options: async (value, { req }) => {
           if (req.files.length > 3) {
-            return false;
+            throw new Error();
           }
 
           await Promise.all(
@@ -78,8 +85,6 @@ const diarySchema = {
               }
             })
           );
-
-          return true;
         },
       },
     },
@@ -91,25 +96,34 @@ const diarySchema = {
       in: ["body"],
       custom: {
         options: (value) => {
-          const tags = typeof value === "string" ? JSON.parse(value) : value || [];
-          if (!Array.isArray(tags)) {
-            return false;
-          }
-          if (tags.length > 4) {
-            return false;
-          }
-          for (const tag of tags) {
-            if (!typeof tag === "string") {
-              return false;
-            }
+          if (typeof value === "string") {
+            const tag = value;
+
             if (tag.length > 20) {
               return false;
             }
+
+            return true;
+          } //
+          else if (Array.isArray(value)) {
+            const tags = value;
+
+            if (tags.length > 4) {
+              return false;
+            }
+
+            for (const tag of tags) {
+              if (tag.length > 20) {
+                return false;
+              }
+            }
+
+            return true;
           }
-          return true;
+          return false;
         },
       },
-      notEmpty: true,
+      optional: true,
     },
     isPublic: {
       in: ["body"],
@@ -174,46 +188,70 @@ const diarySchema = {
       in: ["body"],
       custom: {
         options: (value) => {
-          const deletedImgs = typeof value === "string" ? JSON.parse(value) : value || [];
-          if (!Array.isArray(deletedImgs)) {
-            return false;
-          }
-          if (deletedImgs.length > 3) {
-            return false;
-          }
-          for (const deletedImg of deletedImgs) {
+          if (typeof value === "string") {
+            const deletedImg = value;
+
+            console.log(value);
+
             const regex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
             if (!regex.test(deletedImg)) {
               return false;
             }
+
+            return true;
+          } //
+          else if (Array.isArray(value)) {
+            const deletedImgs = value;
+
+            if (deletedImgs.length > 3) {
+              return false;
+            }
+            for (const deletedImg of deletedImgs) {
+              const regex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+              if (!regex.test(deletedImg)) {
+                return false;
+              }
+            }
+
+            return true;
           }
-          return true;
+          return false;
         },
       },
+      optional: true,
     },
     tags: {
       in: ["body"],
       custom: {
         options: (value) => {
-          const tags = typeof value === "string" ? JSON.parse(value) : value || [];
-          if (!Array.isArray(tags)) {
-            return false;
-          }
-          if (tags.length > 4) {
-            return false;
-          }
-          for (const tag of tags) {
-            if (!typeof tag === "string") {
-              return false;
-            }
+          if (typeof value === "string") {
+            const tag = value;
+
             if (tag.length > 20) {
               return false;
             }
+
+            return true;
+          } //
+          else if (Array.isArray(value)) {
+            const tags = value;
+
+            if (tags.length > 4) {
+              return false;
+            }
+
+            for (const tag of tags) {
+              if (tag.length > 20) {
+                return false;
+              }
+            }
+
+            return true;
           }
-          return true;
+          return false;
         },
       },
-      notEmpty: true,
+      optional: true,
     },
     isPublic: {
       in: ["body"],
@@ -246,10 +284,29 @@ const diarySchema = {
     },
   },
   getUserpage: {
+    page: {
+      in: ["query"],
+      isInt: true,
+      notEmpty: true,
+    },
     accountIdx: {
       in: ["param"],
       isInt: true,
       notEmpty: true,
+    },
+    beginDate: {
+      in: ["query"],
+      matches: {
+        options: [/^\d{4}-\d{2}-\d{2}$/],
+      },
+      optional: true,
+    },
+    endDate: {
+      in: ["query"],
+      matches: {
+        options: [/^\d{4}-\d{2}-\d{2}$/],
+      },
+      optional: true,
     },
   },
   like: {

@@ -40,6 +40,8 @@ const diaryService = {
     // const ipAddress = Number(req.ip.split(".").join(""));
     const ipAddress = req.ip;
 
+    console.log(page, accountIdx, ipAddress);
+
     const result = await psqlConnect.query(
       diaryModel.selectMain({ accountIdx: accountIdx, page: Number(page), ipAddress: ipAddress })
     );
@@ -50,7 +52,7 @@ const diaryService = {
   },
   getSearch: async (req, res) => {
     const { page } = req.query;
-    const tags = typeof req.query.tags === "string" ? JSON.parse(req.query.tags) : req.query.tags;
+    const tags = typeof req.query.tags === "string" ? [req.query.tags] : req.query.tags;
     const { accountIdx } = jwt.verify(req.headers.token);
     // const ipAddress = Number(req.ip.split(".").join(""));
     const ipAddress = req.ip;
@@ -79,7 +81,7 @@ const diaryService = {
   },
   post: async (req, res) => {
     const { textContent, color, isPublic } = req.body;
-    const tags = typeof req.body.tags === "string" ? JSON.parse(req.body.tags) : req.body.tags || [];
+    const tags = typeof req.body.tags === "string" ? [req.body.tags] : req.body.tags || [];
     const imgContents = fileFormat(req.files);
     const { accountIdx } = jwt.verify(req.headers.token);
 
@@ -144,12 +146,11 @@ const diaryService = {
   },
   put: async (req, res) => {
     const { textContent, isPublic, color } = req.body;
-    const tags = typeof req.body.tags === "string" ? JSON.parse(req.body.tags) : req.body.tags || [];
+    const tags = typeof req.body.tags === "string" ? [req.body.tags] : req.body.tags || [];
     const { diaryIdx } = req.params;
     const imgContents = fileFormat(req.files);
     const { accountIdx } = jwt.verify(req.headers.token);
-    const deletedImgs =
-      typeof req.body.deletedImgs === "string" ? JSON.parse(req.body.deletedImgs) : req.body.deletedImgs || [];
+    const deletedImgs = typeof req.body.deletedImgs === "string" ? [req.body.deletedImgs] : req.body.deletedImgs || [];
 
     const deletedImgInfo = deletedImgs.map((url) => {
       const pathname = new URL(url).pathname;
@@ -224,7 +225,11 @@ const diaryService = {
     const { diaryIdx } = req.params;
     const { accountIdx } = jwt.verify(req.headers.token);
 
+    console.log(diaryIdx, accountIdx);
+
     const check = await psqlConnect.query(diaryModel.selectAccountIdx({ diaryIdx: diaryIdx }));
+
+    console.log(check);
 
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
@@ -239,8 +244,6 @@ const diaryService = {
   getUserpage: async (req, res) => {
     const { page, beginDate, endDate } = req.query;
     const { accountIdx } = req.params;
-
-    console.log(page, accountIdx);
 
     const selectedRows = await psqlConnect.query(
       diaryModel.selectFromAccount({ accountIdx: accountIdx, page: page, otherAccount: true, beginDate, endDate })

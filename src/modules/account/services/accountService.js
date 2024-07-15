@@ -4,6 +4,7 @@ import subscriptionModel from "../../../shared/models/subscriptionModel.js";
 import jwt from "../../../shared/utils/jwt.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
 import sendError from "../../../shared/utils/sendError.js";
+import CONSTANTS from "../../../shared/utils/constansts.js";
 
 const accountService = {
   oauthGoogle: (req, res) => {
