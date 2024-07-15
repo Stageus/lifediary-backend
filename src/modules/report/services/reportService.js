@@ -1,3 +1,4 @@
+import accountModel from "../../../shared/models/accountModel.js";
 import reportModel from "../../../shared/models/reportModel.js";
 import diaryModel from "../../../shared/models/diaryModel.js";
 import noticeModel from "../../../shared/models/noticeModel.js";
@@ -60,25 +61,31 @@ const reportService = {
     if (check.rowCount === 0) {
       sendError({ status: 404, message: CONSTANTS.MSG[404] });
     }
+    const diaryIdx = check.rows[0].diaryIdx;
+
+    const selectedRows = await psqlConnect.query(diaryModel.selectAccountIdxAll({ diaryIdx: diaryIdx }));
+    const diaryWriterIdx = selectedRows.rows[0].accountIdx;
 
     // isInvalid의 값은 true, false, null 3가지
     // false일경우 신고의 처리결과만 수정
     if (isInvalid === false) {
       await psqlConnect.query(reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }));
     }
-    // true일 경우 일기를 삭제해야 하므로 신고의 처리결과 수정, 일기 삭제, 신고자와 일기작성자에게 알림 전송
-    else if (isInvalid === true) {
-      const diaryIdx = check.rows[0].diaryIdx;
 
+    // true일 경우 일기를 삭제해야 하므로 신고의 처리결과 수정, 일기 삭제, 작성자 일기 개수 수정, 신고자와 일기작성자에게 알림 전송
+    else if (isInvalid === true) {
       const queries = [
         reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }),
         diaryModel.delete({ diaryIdx: diaryIdx }),
+        accountModel.updateDiaryCnt({ accountIdx: diaryWriterIdx, isPlus: false }),
+        // 신고자에게 알림 전송
         noticeModel.insert({
           fromAccountIdx: accountIdx,
           toAccountIdx: check.rows[0].accountIdx,
           diaryIdx: diaryIdx,
           noticeType: CONSTANTS.NOTICE_TYPE.DELETED_DIARY,
         }),
+        // 일기 작성자에게 알림 전송
         noticeModel.insert({
           fromAccountIdx: accountIdx,
           diaryIdx: diaryIdx,
@@ -88,6 +95,7 @@ const reportService = {
 
       await psqlConnect.transaction(queries);
     }
+
     // null일 경우 이전의 처리결과에 따라 다르게 처리
     else if (isInvalid === null) {
       const prevIsInvalid = check.rows[0].isInvalid;
@@ -97,13 +105,12 @@ const reportService = {
         await psqlConnect.query(reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }));
       }
 
-      // 이전의 처리결과가 true였을 경우 처리결과 수정, 삭제된 일기 복구, 일기 작성자에게 알림 전송
+      // 이전의 처리결과가 true였을 경우 처리결과 수정, 삭제된 일기 복구, 작성자 일기 개수 수정, 일기 작성자에게 알림 전송
       if (prevIsInvalid === true) {
-        const diaryIdx = check.rows[0].diaryIdx;
-
         const queries = [
           reportModel.update({ reportIdx: reportIdx, isInvalid: isInvalid }),
           diaryModel.restore({ diaryIdx: check.rows[0].diaryIdx }),
+          accountModel.updateDiaryCnt({ accountIdx: diaryWriterIdx, isPlus: true }),
           noticeModel.insert({
             fromAccountIdx: accountIdx,
             diaryIdx: diaryIdx,

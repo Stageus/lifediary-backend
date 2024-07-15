@@ -275,7 +275,6 @@ const diaryModel = {
       values: [diaryIdx],
     };
   },
-
   selectFromAccount: ({ accountIdx, page, otherAccount, beginDate = "2000-01-01", endDate = "2099-12-31" }) => {
     if (otherAccount) {
       return {
@@ -291,8 +290,7 @@ const diaryModel = {
                 createdAt BETWEEN $4 AND $5
               ORDER BY createdAt DESC
               LIMIT $2 OFFSET $3;
-              `,
-        values: [
+       values: [
           accountIdx,
           CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT,
           CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT * (page - 1),
@@ -300,7 +298,7 @@ const diaryModel = {
           endDate,
         ],
       };
-    } //
+   } //
     else {
       return {
         sql: `
@@ -323,7 +321,28 @@ const diaryModel = {
           endDate,
         ],
       };
-    }
+  selectAccountIdxAll: ({ diaryIdx }) => {
+    return {
+      sql: `
+            SELECT accountIdx AS "accountIdx" 
+            FROM diary 
+            WHERE idx = $1;
+            `,
+      values: [diaryIdx],
+    };
+  },
+  updateLikeCnt: ({ diaryIdx, isPlus }) => {
+    return {
+      sql: `
+          UPDATE diary
+          SET likeCnt = CASE
+            WHEN $1 THEN likeCnt + 1
+            ELSE likeCnt - 1
+          END
+          WHERE idx = $2;
+        `,
+      values: [isPlus, diaryIdx],
+    };
   },
 };
 

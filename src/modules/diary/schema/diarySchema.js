@@ -251,6 +251,15 @@ const diarySchema = {
       isInt: true,
       notEmpty: true,
     },
+  },
+  like: {
+    diaryIdx: {
+      in: ["param"],
+      isInt: true,
+      notEmpty: true,
+    },
+  },
+  getMypageMine: {
     page: {
       in: ["query"],
       isInt: true,
@@ -269,6 +278,13 @@ const diarySchema = {
         options: [/^\d{4}-\d{2}-\d{2}$/],
       },
       optional: true,
+    },
+  },
+  getMypageLike: {
+    page: {
+      in: ["query"],
+      isInt: true,
+      notEmpty: true,
     },
   },
 };
