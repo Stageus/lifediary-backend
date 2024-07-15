@@ -290,7 +290,8 @@ const diaryModel = {
                 createdAt BETWEEN $4 AND $5
               ORDER BY createdAt DESC
               LIMIT $2 OFFSET $3;
-       values: [
+              `,
+        values: [
           accountIdx,
           CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT,
           CONSTANTS.RULE.DIARY_USER_PAGE_LIMIT * (page - 1),
@@ -298,7 +299,7 @@ const diaryModel = {
           endDate,
         ],
       };
-   } //
+    } //
     else {
       return {
         sql: `
@@ -321,6 +322,8 @@ const diaryModel = {
           endDate,
         ],
       };
+    }
+  },
   selectAccountIdxAll: ({ diaryIdx }) => {
     return {
       sql: `
