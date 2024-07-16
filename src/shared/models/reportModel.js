@@ -15,9 +15,12 @@ const reportModel = {
             JOIN account 
             ON report.accountidx = account.idx
             ORDER BY 
-              CASE WHEN report.isinvalid IS NULL THEN 0 ELSE 1 END,
-              report.createdat DESC 
-            LIMIT $1 OFFSET $2
+              CASE 
+                WHEN report.isinvalid IS NULL THEN 0 
+                ELSE 1 
+              END,
+              COALESCE(report.processedat, report.createdat) DESC
+            LIMIT $1 OFFSET $2;
             `,
       values: [CONSTANTS.RULE.REPORT_PAGE_LIMIT, CONSTANTS.RULE.REPORT_PAGE_LIMIT * (page - 1)],
     };
@@ -66,9 +69,11 @@ const reportModel = {
 
   update: ({ reportIdx, isInvalid }) => {
     return {
-      sql: `UPDATE report
-            SET isInvalid = $1
-            WHERE idx = $2;
+      sql: `
+        UPDATE report
+        SET isInvalid = $1,
+        processedAt = CURRENT_TIMESTAMP
+        WHERE idx = $2 OR diaryIdx = (SELECT diaryIdx FROM report WHERE idx = $2);
             `,
       values: [isInvalid, reportIdx],
     };
