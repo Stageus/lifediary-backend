@@ -225,11 +225,7 @@ const diaryService = {
     const { diaryIdx } = req.params;
     const { accountIdx } = jwt.verify(req.headers.token);
 
-    console.log(diaryIdx, accountIdx);
-
     const check = await psqlConnect.query(diaryModel.selectAccountIdx({ diaryIdx: diaryIdx }));
-
-    console.log(check);
 
     if (check.rowCount === 0) sendError({ status: 404, message: CONSTANTS.MSG[404] });
     if (check.rows[0].accountIdx !== accountIdx) sendError({ status: 403, message: CONSTANTS.MSG[403] });
@@ -294,8 +290,6 @@ const diaryService = {
   getMypageLike: async (req, res) => {
     const { page } = req.query;
     const { accountIdx } = jwt.verify(req.headers.token);
-
-    console.log(page, accountIdx);
 
     const selectedRows = await psqlConnect.query(likeModel.selectLists({ accountIdx: accountIdx, page: page }));
     if (selectedRows.rowCount === 0) {
