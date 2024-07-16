@@ -5,6 +5,11 @@ import jwt from "../../../shared/utils/jwt.js";
 import psqlConnect from "../../../shared/utils/psqlConnect.js";
 import sendError from "../../../shared/utils/sendError.js";
 import CONSTANTS from "../../../shared/utils/constansts.js";
+import fileFormat from "../../../shared/utils/fileFormat.js";
+import pg from "pg";
+import psqlConfig from "../../../shared/configs/psqlConfig.js";
+import bucketModel from "../../../shared/models/bucketModel.js";
+import path from "path";
 
 const accountService = {
   oauthGoogle: (req, res) => {
@@ -50,6 +55,7 @@ const accountService = {
       result = { token: token, isAccountExist: true };
     } else {
       result = {
+        oauthGoogleId: googleAccountInfo.data.id,
         googleName: googleAccountInfo.data.name,
         googleProfileImg: googleAccountInfo.data.picture,
         isAccountExist: false,
@@ -61,7 +67,6 @@ const accountService = {
 
   get: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
-    console.log(accountIdx);
 
     const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ accountIdx: accountIdx }));
     const result = selectedRows.rows[0];
@@ -70,20 +75,50 @@ const accountService = {
   },
 
   post: async (req, res) => {
-    const { profileImg, nickname, oauthGoogleId } = req.body;
+    const { nickname, oauthGoogleId } = req.body;
+    const profileImg = fileFormat(req.files)[0];
 
-    const insertedRows = await psqlConnect.query(
-      accountModel.insert({ oauthGoogleId: oauthGoogleId, nickname: nickname, profileImg: profileImg })
-    );
-    const account = insertedRows.rows[0];
+    let poolClient;
+    let insertedAccount = undefined;
 
-    const token = jwt.sign({
-      profileImg: account.profileImg,
-      accountIdx: account.idx,
-      permission: account.permission,
-    });
+    try {
+      poolClient = await new pg.Pool(psqlConfig).connect();
+      await poolClient.query("BEGIN");
 
-    return { token: token };
+      const insertedRows = await psqlConnect.query(
+        accountModel.insert({ oauthGoogleId: oauthGoogleId, nickname: nickname, profileImg: profileImg.fileName })
+      );
+
+      insertedAccount = insertedRows.rows[0];
+
+      await bucketModel.insertOne({
+        imgContent: profileImg,
+        bucketFolderPath: path.join(insertedAccount.idx.toString(), `profileImg`),
+      });
+
+      await poolClient.query("COMMIT");
+    } catch (err) {
+      await poolClient.query("ROLLBACK");
+      if (err.status) {
+        sendError({ message: err.message, status: err.status, stack: err.stack });
+      } else {
+        sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
+      }
+    } finally {
+      if (poolClient) poolClient.release();
+    }
+
+    if (insertedAccount) {
+      const token = jwt.sign({
+        profileImg: insertedAccount.profileImg,
+        accountIdx: insertedAccount.idx,
+        permission: insertedAccount.permission,
+      });
+
+      return { token: token };
+    }
+
+    return;
   },
 
   putNickname: async (req, res) => {
@@ -110,9 +145,9 @@ const accountService = {
     const selectedRows = await psqlConnect.query(accountModel.selectNickname({ nickname: nickname }));
     const nicknameAccount = selectedRows.rows[0];
 
-    const result = { duplication: false };
+    const result = { isInvalid: false };
     if (nicknameAccount && nicknameAccount.idx !== accountIdx) {
-      result.duplication = true;
+      result.isInvalid = true;
     }
 
     return result;
@@ -120,9 +155,29 @@ const accountService = {
 
   putProfileImg: async (req, res) => {
     const { accountIdx } = jwt.verify(req.headers.token);
-    const { profileImg } = req.body;
+    const profileImg = fileFormat(req.files)[0];
 
-    await psqlConnect.query(accountModel.updateProfileImg({ profileImg: profileImg, accountIdx: accountIdx }));
+    const selectedRows = await psqlConnect.query(accountModel.selectFromIdx({ accountIdx: accountIdx }));
+    const oldProfileImg = selectedRows.rows[0].profileImg;
+
+    const bucketOperations = [];
+
+    // 1. s3에 기존 이미지 삭제
+    bucketOperations.push(bucketModel.deleteOne({ deletedBucketImgUrl: `${accountIdx}/profileImg/${oldProfileImg}` }));
+
+    // 2. s3에 새로 이미지 업로드
+    bucketOperations.push(
+      bucketModel.insertOne({
+        imgContent: profileImg,
+        bucketFolderPath: path.join(accountIdx.toString(), `profileImg`),
+      })
+    );
+
+    // 3. 1과 2를 프로미스로 묶음
+    await Promise.all(bucketOperations);
+
+    // 4. accountModel에 수정
+    await psqlConnect.query(accountModel.updateProfileImg({ profileImg: profileImg.fileName, accountIdx: accountIdx }));
 
     return;
   },
@@ -136,8 +191,12 @@ const accountService = {
   },
 
   getOtherAccount: async (req, res) => {
+    const { accountIdx } = jwt.verify(req.headers.token);
     const { accountIdx: otherAccountIdx } = req.params;
-    console.log(otherAccountIdx);
+
+    if (jwt.verify(req.headers.token) && accountIdx == otherAccountIdx) {
+      sendError({ status: 400, message: CONSTANTS.MSG[400] });
+    }
 
     const selectedRowsFromAccount = await psqlConnect.query(
       accountModel.selectFromIdx({ accountIdx: otherAccountIdx })
