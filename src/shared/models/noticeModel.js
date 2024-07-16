@@ -18,6 +18,7 @@ const noticeModel = {
           n.idx AS "idx", 
           n.diaryIdx AS "diaryIdx", 
           a.nickname AS "nickname",
+          n.isRead AS "isRead",
           n.noticeTypeIdx AS "noticeType", 
           n.createdAt AS "createdAt"
         FROM notice AS n
