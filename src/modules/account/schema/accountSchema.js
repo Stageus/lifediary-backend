@@ -9,10 +9,10 @@ const accountSchema = {
       notEmpty: true,
       isLength: { options: { max: 20 } },
     },
-    profileImg: {
-      in: ["body"],
-      notEmpty: true,
-    },
+    // profileImg: {
+    //   in: ["body"],
+    //   notEmpty: false,
+    // },
   },
 
   putNickname: {
@@ -32,10 +32,10 @@ const accountSchema = {
   },
 
   putProfileImg: {
-    profileImg: {
-      in: ["body"],
-      notEmpty: true,
-    },
+    // profileImg: {
+    //   in: ["body"],
+    //   notEmpty: true,
+    // },
   },
   getOtherAccount: {
     accountIdx: {

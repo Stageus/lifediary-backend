@@ -55,6 +55,47 @@ const bucketModel = {
       sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
     }
   },
+  insertOne: async ({ imgContent, bucketFolderPath }) => {
+    try {
+      await s3.upload(
+        {
+          Bucket: process.env.AWS_BUCKETNAME,
+          Key: path.join(bucketFolderPath, imgContent.fileName),
+          Body: imgContent.buffer,
+        },
+        (err, data) => {
+          if (err) {
+            sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
+          }
+        }
+      );
+
+      return;
+    } catch (err) {
+      sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
+    }
+
+    return;
+  },
+  deleteOne: async ({ deletedBucketImgUrl }) => {
+    try {
+      s3.deleteObject(
+        {
+          Bucket: process.env.AWS_BUCKETNAME,
+          Key: deletedBucketImgUrl,
+        },
+        (err) => {
+          if (err) {
+            reject(err);
+          }
+        }
+      );
+
+      return;
+    } catch (err) {
+      sendError({ message: CONSTANTS.MSG[500], status: 500, stack: err.stack });
+    }
+  },
 };
 
 export default bucketModel;

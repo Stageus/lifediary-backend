@@ -12,8 +12,8 @@ const subscriptionController = {
 
   post: async (req, res, next) => {
     try {
-      await subscriptionService.post(req, res);
-      res.sendStatus(200);
+      const result = await subscriptionService.post(req, res);
+      res.status(200).send(result);
     } catch (err) {
       next(err);
     }
