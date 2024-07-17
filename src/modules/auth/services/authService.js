@@ -1,13 +1,13 @@
-import CONSTANTS from "../../../shared/utils/constansts.js";
 import jwt from "../../../shared/utils/jwt.js";
+import psqlConnect from "../../../shared/utils/psqlConnect.js";
+import accountModel from "../../../shared/models/accountModel.js";
 
 const authService = {
-  getTokenInfo: (req, res) => {
-    const result = jwt.verify(req.headers.token);
+  getTokenInfo: async (req, res) => {
+    const { accountIdx } = jwt.verify(req.headers.token);
 
-    if (!result) {
-      sendError({ status: 401, message: CONSTANTS.MSG[401] });
-    }
+    const selectedRows = await psqlConnect.query(accountModel.selectForAuth({ accountIdx: accountIdx }));
+    const result = selectedRows.rows[0];
 
     return result;
   },
