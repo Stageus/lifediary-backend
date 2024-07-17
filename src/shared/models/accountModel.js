@@ -31,6 +31,20 @@ const accountModel = {
     };
   },
 
+  selectForAuth: ({ accountIdx }) => {
+    return {
+      sql: `
+            SELECT 
+              idx AS "accountIdx", 
+              permission, 
+              profileImg AS "profileImg" 
+            FROM account 
+            WHERE idx = $1;
+            `,
+      values: [accountIdx],
+    };
+  },
+
   delete: ({ accountIdx }) => {
     return {
       sql: `
