@@ -40,7 +40,7 @@ const subscriptionService = {
     const selectedRows = await psqlConnect.query(
       subscriptionModel.select({ fromAccountIdx: accountIdx, toAccountIdx: toAccountIdx })
     );
-    const isSubscribed = !selectedRows.rows[0]?.isDeleted;
+    const isSubscribed = selectedRows.rows[0] && selectedRows.rows[0].isDeleted === false ? true : false;
 
     // 2-1. 현재 구독중이라면 구독 해제, 구독자수 -1 묶어서 트랜잭션
     if (isSubscribed) {
