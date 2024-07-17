@@ -18,6 +18,7 @@ const noticeModel = {
           n.idx AS "idx", 
           n.diaryIdx AS "diaryIdx", 
           a.nickname AS "nickname",
+          n.isRead AS "isRead",
           n.noticeTypeIdx AS "noticeType", 
           n.createdAt AS "createdAt"
         FROM notice AS n
@@ -68,14 +69,37 @@ const noticeModel = {
         `,
         values: [noticeType, fromAccountIdx, diaryIdx],
       };
+    } else if (noticeType === CONSTANTS.NOTICE_TYPE.DELETED_MY_DIARY) {
+      return {
+        sql: `
+              INSERT INTO notice (noticeTypeIdx, fromAccountIdx, toAccountIdx, diaryIdx) 
+              SELECT $1, $2, account.idx, $3
+              FROM diary
+              JOIN account ON diary.accountIdx = account.idx
+              WHERE diary.idx = $3
+              `,
+        values: [noticeType, fromAccountIdx, diaryIdx],
+      };
+    } else if (noticeType === CONSTANTS.NOTICE_TYPE.DELETED_DIARY) {
+      return {
+        sql: `
+              INSERT INTO notice (noticeTypeIdx, fromAccountIdx, toAccountIdx, diaryIdx) 
+              VALUES ( $1, $2, $3, $4)
+              `,
+        values: [noticeType, fromAccountIdx, toAccountIdx, diaryIdx],
+      };
+    } else if (noticeType === CONSTANTS.NOTICE_TYPE.RECOVERED_DIARY) {
+      return {
+        sql: `
+              INSERT INTO notice (noticeTypeIdx, fromAccountIdx, toAccountIdx, diaryIdx) 
+              SELECT $1, $2, account.idx, $3
+              FROM diary
+              JOIN account ON diary.accountIdx = account.idx
+              WHERE diary.idx = $3
+              `,
+        values: [noticeType, fromAccountIdx, diaryIdx],
+      };
     }
-    return {
-      sql: `
-            INSERT INTO notice (noticeTypeIdx, fromAccountIdx, toAccountIdx, diaryIdx) 
-            VALUES ( $4, $1, $2, $3)
-            `,
-      values: [fromAccountIdx, toAccountIdx, diaryIdx, noticeType],
-    };
   },
   updateRead: ({ toAccountIdx }) => {
     return {

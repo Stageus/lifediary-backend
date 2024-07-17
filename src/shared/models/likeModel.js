@@ -34,13 +34,13 @@ const likeModel = {
             WHERE accountIdx = $2 AND diaryIdx = $3;
             `,
       values: [status, accountIdx, diaryIdx],
-      };
+    };
   },
   selectLists: ({ accountIdx, page }) => {
     return {
       sql: `
           SELECT 
-            "like".idx,
+            diary.idx AS "idx",
             imgContents[1] AS "thumbnail"
           FROM "like" 
           JOIN diary 

@@ -37,7 +37,6 @@ const accountSchema = {
       },
     },
   },
-
   putNickname: {
     nickname: {
       in: ["body"],
