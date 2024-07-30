@@ -25,24 +25,47 @@ const accountService = {
   oauthGoogleRedirect: async (req, res) => {
     const { code } = req.query;
 
-    const googleToken = await axios.post(process.env.GOOGLE_TOKEN_URL, {
-      code,
-      client_id: process.env.GOOGLE_ID,
-      client_secret: process.env.GOOGLE_SECRET,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-      grant_type: "authorization_code",
+    const tokenResponse = await fetch(process.env.GOOGLE_TOKEN_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code,
+        client_id: process.env.GOOGLE_ID,
+        client_secret: process.env.GOOGLE_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: "authorization_code",
+      }),
     });
 
-    const googleAccountInfo = await axios.get(process.env.GOOGLE_USERINFO_URL, {
+    if (!tokenResponse.ok) {
+      throw new Error("Failed to fetch Google token");
+    }
+
+    const tokenData = await tokenResponse.json();
+    const accessToken = tokenData.access_token;
+
+    // Google 사용자 정보 요청
+    const userInfoResponse = await fetch(process.env.GOOGLE_USERINFO_URL, {
       headers: {
-        Authorization: `Bearer ${googleToken.data.access_token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
+    if (!userInfoResponse.ok) {
+      throw new Error("Failed to fetch user info from Google");
+    }
+
+    const googleAccountInfo = await userInfoResponse.json();
+
     let result = {};
     const selectedRows = await psqlConnect.query(
-      accountModel.selectFromGoogleId({ oauthGoogleId: googleAccountInfo.data.id })
+      accountModel.selectFromGoogleId({
+        oauthGoogleId: googleAccountInfo.id,
+      })
     );
+
     const account = selectedRows.rows[0];
 
     if (account) {

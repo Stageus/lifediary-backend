@@ -31,8 +31,8 @@ server.use("/subscription", subscriptionRoute);
 server.use("/", exceptionHandler);
 server.use(errorHandler);
 
-server.listen(8000, () => {
-  console.log(`8000번 포트로 실행 중`);
+server.listen(80, () => {
+  console.log(`80번 포트로 실행 중`);
 });
 
 process.on("uncaughtException", uncaughtExceptionLogger);
