@@ -225,6 +225,10 @@ const accountService = {
       accountModel.selectFromIdx({ accountIdx: otherAccountIdx })
     );
 
+    if (selectedRowsFromAccount.rowCount == 0) {
+      sendError({ status: 404, message: CONSTANTS.MSG[404] });
+    }
+
     let result = selectedRowsFromAccount.rows[0];
     result.isSubscribed = false;
 
