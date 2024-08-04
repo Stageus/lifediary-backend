@@ -260,14 +260,16 @@ const diaryService = {
 
     const queries = [];
     const selectedRows = await psqlConnect.query(likeModel.select({ accountIdx: accountIdx, diaryIdx: diaryIdx }));
-    const isLiked = !selectedRows.rows[0]?.isDeleted;
+    const isLiked = selectedRows.rows[0] && selectedRows.rows[0].isDeleted === false ? true : false;
 
-    if (!isLiked) {
-      queries.push(diaryModel.updateLikeCnt({ diaryIdx: diaryIdx, isPlus: true }));
-      queries.push(likeModel.updateIsDeleted({ accountIdx: accountIdx, diaryIdx: diaryIdx, status: false }));
-    } else if (isLiked) {
+    if (isLiked) {
+      // 현재 좋아요가 눌린 상태 -> 좋아요 해제 상태로 바꿔야 함
       queries.push(diaryModel.updateLikeCnt({ diaryIdx: diaryIdx, isPlus: false }));
-      queries.push(likeModel.insertWithUpdate({ accountIdx: accountIdx, diaryIdx: diaryIdx }));
+      queries.push(likeModel.updateIsDeleted({ accountIdx: accountIdx, diaryIdx: diaryIdx, status: true }));
+    } else if (!isLiked) {
+      // 현재 좋아요가 눌리지 않은 상태 -> 좋아요 상태로 바꿔야 함
+      queries.push(diaryModel.updateLikeCnt({ diaryIdx: diaryIdx, isPlus: true }));
+      queries.push(likeModel.insertWithUpdate({ accountIdx: accountIdx, diaryIdx: diaryIdx, status: false }));
     }
 
     await psqlConnect.transaction(queries);
