@@ -39,10 +39,6 @@ const accountService = {
       }),
     });
 
-    if (!tokenResponse.ok) {
-      throw new Error("Failed to fetch Google token");
-    }
-
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
@@ -52,10 +48,6 @@ const accountService = {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
-    if (!userInfoResponse.ok) {
-      throw new Error("Failed to fetch user info from Google");
-    }
 
     const googleAccountInfo = await userInfoResponse.json();
 
@@ -78,9 +70,9 @@ const accountService = {
       result = { token: token, isAccountExist: true };
     } else {
       result = {
-        oauthGoogleId: googleAccountInfo.data.id,
-        googleName: googleAccountInfo.data.name,
-        googleProfileImg: googleAccountInfo.data.picture,
+        oauthGoogleId: googleAccountInfo.id,
+        googleName: googleAccountInfo.name,
+        googleProfileImg: googleAccountInfo.picture,
         isAccountExist: false,
       };
     }
